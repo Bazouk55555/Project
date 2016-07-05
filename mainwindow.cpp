@@ -33,7 +33,6 @@ void mainwindow::open()
         {
             scribbleArea->openImage(fileName);
             input_datas->setEnabled(true);
-            select_liver->setEnabled(true);
             select_tumor->setEnabled(true);
             penWidthAct->setEnabled(true);
         }
@@ -72,16 +71,16 @@ void mainwindow::enterDatas()
     }
 }
 
-void mainwindow::selectLiver()
+void mainwindow::computeAlgorithm()
 {
-    scribbleArea->setImageLoaded(true);
-    scribbleArea->setPenColor(Qt::red);
+    scribbleArea->computeAlgorithm();
 }
 
 void mainwindow::selectTumor()
 {
     scribbleArea->setImageLoaded(true);
-    scribbleArea->setPenColor(Qt::green);
+    scribbleArea->setPenColor(Qt::red);
+    compute_algorithm->setEnabled(true);
 }
 
 void mainwindow::penWidth()
@@ -116,13 +115,13 @@ void mainwindow::createActions()
     input_datas->setEnabled(false);
     connect(input_datas, SIGNAL(triggered()), this, SLOT(enterDatas()));
 
-    select_liver=new QAction(tr("&Select Liver"), this);
-    select_liver->setEnabled(false);
-    connect(select_liver, SIGNAL(triggered()), this, SLOT(selectLiver()));
-
     select_tumor=new QAction(tr("&Select Tumor"), this);
     select_tumor->setEnabled(false);
     connect(select_tumor, SIGNAL(triggered()), this, SLOT(selectTumor()));
+
+    compute_algorithm=new QAction(tr("&Compute algorithm"), this);
+    compute_algorithm->setEnabled(false);
+    connect(compute_algorithm, SIGNAL(triggered()), this, SLOT(computeAlgorithm()));
 
     penWidthAct = new QAction(tr("Pen &Width"), this);
     penWidthAct->setEnabled(false);
@@ -147,8 +146,8 @@ void mainwindow::createMenus()
 
     optionMenu = new QMenu(tr("&Options"), this);
     optionMenu->addAction(input_datas);
-    optionMenu->addAction(select_liver);
     optionMenu->addAction(select_tumor);
+    optionMenu->addAction(compute_algorithm);
     optionMenu->addAction(penWidthAct);
     optionMenu->addSeparator();
     optionMenu->addAction(clearScreenAct);

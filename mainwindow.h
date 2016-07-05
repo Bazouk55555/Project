@@ -20,7 +20,7 @@ private slots:
     void open();
     void save();
     void enterDatas();
-    void selectLiver();
+    void computeAlgorithm();
     void selectTumor();
     void penWidth();
 
@@ -40,7 +40,7 @@ private:
     QList<QAction *> saveAsActs;
     QAction *exitAct;
     QAction *input_datas;
-    QAction *select_liver;
+    QAction *compute_algorithm;
     QAction *select_tumor;
     QAction *penWidthAct;
     QAction *clearScreenAct;

@@ -5,6 +5,8 @@
 #include <QImage>
 #include <QPoint>
 #include <QWidget>
+#include <QSlider>
+#include <iostream>
 
 class scribble : public QWidget
 {
@@ -12,12 +14,13 @@ class scribble : public QWidget
 
 public:
     scribble(QWidget *parent = 0);
-
+    QImage getImage();
     bool openImage(const QString &fileName);
     bool saveImage(const QString &fileName, const char *fileFormat);
     void setPenColor(const QColor &newColor);
     void setPenWidth(int newWidth);
     void setImageLoaded(bool loaded);
+    double computeAlgorithm();
 
     bool isModified() const { return modified; }
     QColor penColor() const { return myPenColor; }
@@ -25,6 +28,7 @@ public:
 
 public slots:
     void clearImage();
+    void display_image(int);
 
 protected:
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
@@ -43,7 +47,12 @@ private:
     int myPenWidth;
     QColor myPenColor;
     QImage image;
+    QImage array_image[200];
+    QString array[200];
+    int array_counter;
     QPoint lastPoint;
+    QSlider *slider;
+
 };
 
 #endif
