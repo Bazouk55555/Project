@@ -27,11 +27,12 @@ void mainwindow::closeEvent(QCloseEvent *event)
 void mainwindow::open()
 {
     if (maybeSave()) {
-        QString fileName = QFileDialog::getOpenFileName(this,
-                                   tr("Open File"), QDir::currentPath());
-        if (!fileName.isEmpty())
+        //QString fileName = QFileDialog::getOpenFileName(this,
+        //                           tr("Open File"), QDir::currentPath());
+        QString directory = QFileDialog::getExistingDirectory(this);
+        if (!directory.isEmpty())
         {
-            scribbleArea->openImage(fileName);
+            scribbleArea->openImage(directory);
             input_datas->setEnabled(true);
             select_tumor->setEnabled(true);
             penWidthAct->setEnabled(true);
@@ -49,12 +50,12 @@ void mainwindow::save()
 void mainwindow::enterDatas()
 {
     bool ok=false;
-    QString volume_entered= QInputDialog::getText(this,"volume of the liver", "Enter the volume of the liver remaining at the end", QLineEdit::Normal, QString(), &ok);
-    if (ok && !volume_entered.isEmpty())
+    double volume_entered= QInputDialog::getDouble(this,"volume of the liver", "Enter the volume of the liver remaining at the end", 0,0,100,2, &ok);
+    if (ok)
     {
         ok=false;
-        QString margin_entered= QInputDialog::getText(this,"Margin", "Enter the margin", QLineEdit::Normal, QString(), &ok);
-        if(ok && !volume_entered.isEmpty())
+        double margin_entered= QInputDialog::getDouble(this,"Margin", "Enter the margin", 0,0,2,2, &ok);
+        if(ok)
         {
             volume=volume_entered;
             margin=margin_entered;
@@ -73,7 +74,10 @@ void mainwindow::enterDatas()
 
 void mainwindow::computeAlgorithm()
 {
-    scribbleArea->computeAlgorithm();
+    if(scribbleArea->computeAlgorithm()>volume)
+    {
+        QMessageBox::information(this, "Result", "Tee volume remaining is "/*+scribbleArea->computeAlgorithm()+". You can simply do the technique number 1"*/);
+    }
 }
 
 void mainwindow::selectTumor()

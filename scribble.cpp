@@ -4,6 +4,7 @@
 
 #include "compute_volume.h"
 #include "scribble.h"
+#include "transform_2_jpeg.h"
 
 scribble::scribble(QWidget *parent)
     : QWidget(parent)
@@ -26,21 +27,72 @@ QImage scribble::getImage()
     return image;
 }
 
-bool scribble::openImage(const QString &fileName)
+/*bool scribble::openImage(const QString &fileName)
 {
     QImage loadedImage;
-    if (!loadedImage.load(fileName)){
+
+    // transform the name of the file from .dcm to .jpg and the file from dicom to jpeg and load the new jpeg image
+    std::string fileName1_str=changeDicomToJpeg(fileName.toStdString());
+    transformation(fileName.toStdString(),fileName1_str);
+    QString fileName1(fileName1_str.c_str());
+    if (!loadedImage.load(fileName1)){
         return false;
     }
+
+    //resize the image to the size of the scribble
     QSize newSize = loadedImage.size().expandedTo(size());
     resizeImage(&loadedImage, newSize);
     image = loadedImage;
+
+    // and an image to the slider
     array[array_counter]=fileName;
     array_image[array_counter]=image;
     array_counter++;
     slider->setMaximum(array_counter-1);
+
     modified = false;
     update();
+    return true;
+}*/
+
+bool scribble::openImage(const QString &directoryName)
+{
+    std::cout<<"the directory name is "<<directoryName.toStdString()<<std::endl;
+    QImage loadedImage;
+    QDir myDir(directoryName);
+    QStringList list_all_files=myDir.entryList();
+    for(int i=0;i<list_all_files.length();i++)
+    {
+        std::cout<<"enter in the files number "<<i<<std::endl;
+        if(isDicom(list_all_files.at(i).toStdString()))
+        {
+            std::string fileName=directoryName.toStdString()+"/"+list_all_files.at(i).toStdString();
+            std::cout<<"the file number "<<i<<" is a dicom image and his name is "<<fileName<<std::endl;
+            // transform the name of the file from .dcm to .jpg and the file from dicom to jpeg and load the new jpeg image
+            std::string fileName1_str=changeDicomToJpeg(fileName);
+            std::cout<<"name of the best file "<<fileName1_str<<std::endl;
+            transformation(fileName,fileName1_str);
+            std::cout<<"name of file number "<<i<<" is "<<fileName1_str<<std::endl;
+            QString fileName1(fileName1_str.c_str());
+            if (!loadedImage.load(fileName1)){
+                std::cout<<"ce return casse les couilles"<<std::endl;
+                //return false;
+            }
+            //resize the image to the size of the scribble
+            QSize newSize = loadedImage.size().expandedTo(size());
+            resizeImage(&loadedImage, newSize);
+            image = loadedImage;
+
+            // and an image to the slider
+            array[array_counter]=list_all_files.at(i);
+            array_image[array_counter]=image;
+            array_counter++;
+            slider->setMaximum(array_counter-1);
+
+            modified = false;
+            update();
+        }
+    }
     return true;
 }
 

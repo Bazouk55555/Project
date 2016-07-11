@@ -45,8 +45,8 @@ private:
     QAction *penWidthAct;
     QAction *clearScreenAct;
 
-    QString volume;
-    QString margin;
+    double volume;
+    double margin;
 };
 
 #endif
