@@ -52,3 +52,32 @@ int getVolumeTumor(QImage image_computed)
     }
     return volume;
 }
+
+int getVolumeAfterSeparation(QImage image_computed)
+{
+    QColor **color=new QColor*[image_computed.size().width()];
+    QRgb **s=new QRgb*[image_computed.size().width()];
+    int volume=0;
+
+    for(int i=0;i<image_computed.size().width();i++)
+    {
+        s[i]=new QRgb[image_computed.size().height()];
+        color[i]=new QColor[image_computed.size().height()];
+
+        // Go through the width of the image
+        int j=0;
+        s[i][j]=image_computed.pixel(i,j);
+        color[i][j].setRgb((s[i][j]));
+        QColor colorPixel=color[i][j];
+        while(j<image_computed.size().height()&&colorPixel.green()<50)
+        {
+            if(colorPixel.green()<50&&colorPixel.red()<50&&colorPixel.blue()<100)
+            {
+                volume++;
+            }
+            j++;
+        }
+    }
+    volume=getVolumeLiver(image_computed)+1/9*volume;
+    return volume;
+}

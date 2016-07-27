@@ -15,12 +15,14 @@ class scribble : public QWidget
 public:
     scribble(QWidget *parent = 0);
     QImage getImage();
-    bool openImage(const QString &fileName);
+    bool openFile(const QString &fileName);
+    bool openFolder(const QString &directoryName);
     bool saveImage(const QString &fileName, const char *fileFormat);
     void setPenColor(const QColor &newColor);
     void setPenWidth(int newWidth);
     void setImageLoaded(bool loaded);
-    double computeAlgorithm();
+    double computeAlgorithm1();
+    double computeAlgorithm2();
 
     bool isModified() const { return modified; }
     QColor penColor() const { return myPenColor; }

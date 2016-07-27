@@ -27,37 +27,40 @@ QImage scribble::getImage()
     return image;
 }
 
-/*bool scribble::openImage(const QString &fileName)
+//adding a open image and change the current openimage with openfile
+bool scribble::openFile(const QString &fileName)
 {
     QImage loadedImage;
-
-    // transform the name of the file from .dcm to .jpg and the file from dicom to jpeg and load the new jpeg image
-    std::string fileName1_str=changeDicomToJpeg(fileName.toStdString());
-    transformation(fileName.toStdString(),fileName1_str);
-    QString fileName1(fileName1_str.c_str());
-    if (!loadedImage.load(fileName1)){
+    if(isDicom(fileName.toStdString()))
+    {
+        // transform the name of the file from .dcm to .jpg and the file from dicom to jpeg and load the new jpeg image
+        std::string fileName1_str=changeDicomToJpeg(fileName.toStdString());
+        transformation(fileName.toStdString(),fileName1_str);
+        QString fileName1(fileName1_str.c_str());
+        if (!loadedImage.load(fileName1)){
         return false;
+        }
+        //resize the image to the size of the scribble
+        QSize newSize = loadedImage.size().expandedTo(size());
+        resizeImage(&loadedImage, newSize);
+        image = loadedImage;
+
+        // and add an image to the slider
+        array[array_counter]=fileName;
+        array_image[array_counter]=image;
+        array_counter++;
+        slider->setMaximum(array_counter-1);
+        //slider->
+
+        modified = false;
+        update();
     }
 
-    //resize the image to the size of the scribble
-    QSize newSize = loadedImage.size().expandedTo(size());
-    resizeImage(&loadedImage, newSize);
-    image = loadedImage;
-
-    // and an image to the slider
-    array[array_counter]=fileName;
-    array_image[array_counter]=image;
-    array_counter++;
-    slider->setMaximum(array_counter-1);
-
-    modified = false;
-    update();
     return true;
-}*/
+}
 
-bool scribble::openImage(const QString &directoryName)
+bool scribble::openFolder(const QString &directoryName)
 {
-    std::cout<<"the directory name is "<<directoryName.toStdString()<<std::endl;
     QImage loadedImage;
     QDir myDir(directoryName);
     QStringList list_all_files=myDir.entryList();
@@ -67,16 +70,12 @@ bool scribble::openImage(const QString &directoryName)
         if(isDicom(list_all_files.at(i).toStdString()))
         {
             std::string fileName=directoryName.toStdString()+"/"+list_all_files.at(i).toStdString();
-            std::cout<<"the file number "<<i<<" is a dicom image and his name is "<<fileName<<std::endl;
             // transform the name of the file from .dcm to .jpg and the file from dicom to jpeg and load the new jpeg image
             std::string fileName1_str=changeDicomToJpeg(fileName);
-            std::cout<<"name of the best file "<<fileName1_str<<std::endl;
             transformation(fileName,fileName1_str);
-            std::cout<<"name of file number "<<i<<" is "<<fileName1_str<<std::endl;
             QString fileName1(fileName1_str.c_str());
             if (!loadedImage.load(fileName1)){
-                std::cout<<"ce return casse les couilles"<<std::endl;
-                //return false;
+                return false;
             }
             //resize the image to the size of the scribble
             QSize newSize = loadedImage.size().expandedTo(size());
@@ -88,6 +87,7 @@ bool scribble::openImage(const QString &directoryName)
             array_image[array_counter]=image;
             array_counter++;
             slider->setMaximum(array_counter-1);
+            //slider->
 
             modified = false;
             update();
@@ -207,7 +207,7 @@ void scribble::display_image(int number_image)
     update();
 }
 
-double scribble::computeAlgorithm()
+double scribble::computeAlgorithm1()
 {
     double volume_final=0;
     for(int i=0;i<array_counter;i++)
@@ -215,6 +215,17 @@ double scribble::computeAlgorithm()
         volume_final= volume_final+getVolumeTumor(array_image[i])/(double)(getVolumeLiver(array_image[i])+getVolumeTumor(array_image[i]));
     }
     volume_final=volume_final/array_counter;
-    std::cout<<"Surface of the liver: "<<volume_final<<" m3"<<endl;
+    return volume_final;
+}
+
+double scribble::computeAlgorithm2()
+{
+    double volume_final=0;
+    setPenColor(Qt::green);
+    for(int i=0;i<array_counter;i++)
+    {
+        volume_final=volume_final+getVolumeTumor(array_image[i])/(double) (getVolumeAfterSeparation(array_image[i]));
+    }
+    volume_final=volume_final/array_counter;
     return volume_final;
 }

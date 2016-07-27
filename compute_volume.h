@@ -5,5 +5,6 @@
 
 int getVolumeLiver(QImage image_computed);
 int getVolumeTumor(QImage image_computed);
+int getVolumeAfterSeparation(QImage image_computed);
 
 #endif // COMPUTE_VOLUME_H

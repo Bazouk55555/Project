@@ -17,7 +17,8 @@ protected:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
 
 private slots:
-    void open();
+    void openFolder();
+    void openFile();
     void save();
     void enterDatas();
     void computeAlgorithm();
@@ -37,6 +38,7 @@ private:
     QMenu *optionMenu;
 
     QAction *openAct;
+    QAction *openAct2;
     QList<QAction *> saveAsActs;
     QAction *exitAct;
     QAction *input_datas;

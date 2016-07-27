@@ -24,18 +24,28 @@ void mainwindow::closeEvent(QCloseEvent *event)
     }
 }
 
-void mainwindow::open()
+//To open a folder with Dicom images
+void mainwindow::openFolder()
 {
     if (maybeSave()) {
-        //QString fileName = QFileDialog::getOpenFileName(this,
-        //                           tr("Open File"), QDir::currentPath());
         QString directory = QFileDialog::getExistingDirectory(this);
         if (!directory.isEmpty())
         {
-            scribbleArea->openImage(directory);
+            scribbleArea->openFolder(directory);
             input_datas->setEnabled(true);
-            select_tumor->setEnabled(true);
-            penWidthAct->setEnabled(true);
+        }
+    }
+}
+
+//To open a Dicom image file
+void mainwindow::openFile()
+{
+    if (maybeSave()) {
+        QString fileName = QFileDialog::getOpenFileName(this);
+        if (!fileName.isEmpty())
+        {
+            scribbleArea->openFile(fileName);
+            input_datas->setEnabled(true);
         }
     }
 }
@@ -47,6 +57,7 @@ void mainwindow::save()
     saveFile(fileFormat);
 }
 
+//To enter the datas margin and volume expected
 void mainwindow::enterDatas()
 {
     bool ok=false;
@@ -59,6 +70,8 @@ void mainwindow::enterDatas()
         {
             volume=volume_entered;
             margin=margin_entered;
+            select_tumor->setEnabled(true);
+            penWidthAct->setEnabled(true);
             return;
         }
         else
@@ -74,9 +87,16 @@ void mainwindow::enterDatas()
 
 void mainwindow::computeAlgorithm()
 {
-    if(scribbleArea->computeAlgorithm()>volume)
+    std::cout<<"Le volume tech1 est de "<<scribbleArea->computeAlgorithm1()<<std::endl;
+    if(scribbleArea->computeAlgorithm1()>volume)
     {
-        QMessageBox::information(this, "Result", "Tee volume remaining is "/*+scribbleArea->computeAlgorithm()+". You can simply do the technique number 1"*/);
+        QMessageBox::information(this, "Result", "Tee volume remaining is "/*+scribbleArea->computeAlgorithm1()+". You can simply do the technique number 1"*/);
+        return;
+    }
+    if(scribbleArea->computeAlgorithm2()>volume)
+    {
+        QMessageBox::information(this, "Result", "Tee volume remaining is "/*+scribbleArea->computeAlgorithm2()+". You can simply do the technique number 2"*/);
+        return;
     }
 }
 
@@ -100,8 +120,11 @@ void mainwindow::penWidth()
 
 void mainwindow::createActions()
 {
-    openAct = new QAction(tr("&Open"), this);
-    connect(openAct, SIGNAL(triggered()), this, SLOT(open()));
+    openAct = new QAction(tr("&Open Folder"), this);
+    connect(openAct, SIGNAL(triggered()), this, SLOT(openFolder()));
+
+    openAct2 = new QAction(tr("&Open File"), this);
+    connect(openAct2, SIGNAL(triggered()), this, SLOT(openFile()));
 
     foreach (QByteArray format, QImageWriter::supportedImageFormats()) {
         QString text = tr("%1...").arg(QString(format).toUpper());
@@ -144,6 +167,7 @@ void mainwindow::createMenus()
 
     fileMenu = new QMenu(tr("&File"), this);
     fileMenu->addAction(openAct);
+    fileMenu->addAction(openAct2);
     fileMenu->addMenu(saveAsMenu);
     fileMenu->addSeparator();
     fileMenu->addAction(exitAct);
