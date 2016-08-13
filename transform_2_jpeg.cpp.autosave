@@ -15,6 +15,7 @@
 #include <list>*/
 
 bool isJpg(std::string file){
+    // Check if the name of the file does not finish by ".jpg". Otherwse return true
     if(file.c_str()[file.length()-1]!='g')
     {
         return false;
@@ -35,6 +36,7 @@ bool isJpg(std::string file){
 }
 
 bool isPng(std::string file){
+    // Check if the name of the file does not finish by ".png". Otherwse return true
     if(file.c_str()[file.length()-1]!='g')
     {
         return false;
@@ -55,6 +57,7 @@ bool isPng(std::string file){
 }
 
 //All this code was used to transform a dicom image to a jpeg using Imebra library. It is not useful anymore but it can be in the future
+
 /*
 using namespace puntoexe;
 using namespace puntoexe::imebra;

@@ -3,21 +3,24 @@
 
 int getVolumeLiver(QImage image_computed){
 
-    // Go through the height of the image
     QColor **color=new QColor*[image_computed.size().width()];
     QRgb **s=new QRgb*[image_computed.size().width()];
     int volume=0;
+
+    // Go through the width of the image
     for(int i=0;i<image_computed.size().width();i++)
     {
         s[i]=new QRgb[image_computed.size().height()];
         color[i]=new QColor[image_computed.size().height()];
 
-        // Go through the width of the image
+        // Go through the height of the image
         for(int j=0;j<image_computed.size().height();j++)
         {
             s[i][j]=image_computed.pixel(i,j);
             color[i][j].setRgb((s[i][j]));
             QColor colorPixel=color[i][j];
+
+            //If the color is green, add one pixel to the volume computed
             if(colorPixel.green()>110&&colorPixel.red()<80&&colorPixel.blue()<80)
             {
                 volume++;
@@ -38,17 +41,20 @@ int getVolumeTumor(QImage image_computed, int margin)
     QRgb **s=new QRgb*[image_computed.size().width()];
     int volume=0;
 
+    // Go through the width of the image
     for(int i=0;i<image_computed.size().width();i++)
     {
         s[i]=new QRgb[image_computed.size().height()];
         color[i]=new QColor[image_computed.size().height()];
 
-        // Go through the width of the image
+        // Go through the height of the image
         for(int j=0;j<image_computed.size().height();j++)
         {
             s[i][j]=image_computed.pixel(i,j);
             color[i][j].setRgb((s[i][j]));
             QColor colorPixel=color[i][j];
+
+            //If the color is blue, add one pixel to the volume computed
             if(colorPixel.red()<80&&colorPixel.green()<80&&colorPixel.blue()>110)
             {
                 volume++;
@@ -66,63 +72,69 @@ int getVolumeTumor(QImage image_computed, int margin)
 
 int getVolumeAfterSeparation(QImage image_computed, int part)
 {
-    std::cout<<"j entre dans la methode"<<std::endl;
     bool a=false;
+
+    // Go through the width of the image
     for(int i=0;i<image_computed.width();i++)
     {
+        // Go through the height of the image
         for(int j=0;j<image_computed.height();j++)
         {
+            // Check if there is a red pixel in the image to know if the separation has been maid
             if(image_computed.pixelColor(i,j).blue()<80&&image_computed.pixelColor(i,j).green()<80&&image_computed.pixelColor(i,j).red()>110)
             {
-                std::cout<<"a l interoeur du if pour a ==true"<<std::endl;
                 a=true;
                 break;
             }
         }
+        // If the separation has been maid, a=true so we can leave the loop
         if(a==true)
         {
-            std::cout<<"a l interoeur du if pour a ==true bis"<<std::endl;
             break;
         }
     }
     int volume=0;
+
+    // If the separation has been maid
     if(a==true)
     {
-        std::cout<<"il est a l interieur de la principal loop"<<std::endl;
         QColor **color=new QColor*[image_computed.size().width()];
         QRgb **s=new QRgb*[image_computed.size().width()];
 
+        // Go through the width of the image
         for(int i=0;i<image_computed.size().width();i++)
         {
             s[i]=new QRgb[image_computed.size().height()];
             color[i]=new QColor[image_computed.size().height()];
 
-            // Go through the width of the image
+            // If the user has chosen the low part of the separation
             if(part==0){
+                // Go through each column of the image until it reached the red separation
                 for(int j=0;j<image_computed.size().height();j++){
                     s[i][j]=image_computed.pixel(i,j);
                     color[i][j].setRgb((s[i][j]));
                     QColor colorPixel=color[i][j];
-                    //std::cout<<"i : "<<i<<" j : "<<j<<std::endl;
+
+                    // If there is a red pixel the red line of separation has been reached, we can go to the next column
                     if(colorPixel.red()>110&&colorPixel.blue()<80&&colorPixel.green()<80)
                     {
-                        std::cout<<"atteint le rpouge"<<endl;
                         break;
                     }
+                    // If the separation is still not reached, one more pixel is added to the volume
                     if(colorPixel.green()>110&&colorPixel.red()<80&&colorPixel.blue()<80)
                     {
-                        std::cout<<"augmente le volume"<<endl;
                         volume++;
                     }
-
+                    // If a blue pixel is reached, the wrong part of the liver has been chosen
                     if(colorPixel.green()<80&&colorPixel.red()<80&&colorPixel.blue()>110)
                     {
-                        std::cout<<"hahahahahahahaha"<<std::endl;
                         QMessageBox::information(0, "Result", "You have probably chosen the wrong part");
                         return 0;
                     }
                 }
             }
+
+            // If the user has chosen the high part of the separation(the explanation is the same for the high part)
             if(part==1){
                 for(int j=image_computed.size().height();j>0;j--){
                     s[i][image_computed.size().height()-j]=image_computed.pixel(i,j);
@@ -155,9 +167,7 @@ int getVolumeAfterSeparation(QImage image_computed, int part)
         delete s;
         delete color;
     }
-    std::cout<<"le volume ajoute est de : "<<volume<<std::endl;
     volume=getVolumeLiver(image_computed)+volume;
-    std::cout<<"volume du liver apres increasing : "<<volume<<std::endl;
     return volume;
 }
 
