@@ -1,6 +1,8 @@
 #include <QtWidgets>
 #include <iostream>
+#include <string>
 #include "mainwindow.h"
+#include "compute_volume.h"
 #include "scribble.h"
 
 mainwindow::mainwindow()
@@ -33,6 +35,9 @@ void mainwindow::openFolder()
         {
             scribbleArea->openFolder(directory);
             input_datas->setEnabled(true);
+            select_tumor->setEnabled(true);
+            select_liver->setEnabled(true);
+            penWidthAct->setEnabled(true);
         }
     }
 }
@@ -46,6 +51,9 @@ void mainwindow::openFile()
         {
             scribbleArea->openFile(fileName);
             input_datas->setEnabled(true);
+            select_tumor->setEnabled(true);
+            select_liver->setEnabled(true);
+            penWidthAct->setEnabled(true);
         }
     }
 }
@@ -61,7 +69,7 @@ void mainwindow::save()
 void mainwindow::enterDatas()
 {
     bool ok=false;
-    double volume_entered= QInputDialog::getDouble(this,"volume of the liver", "Enter the volume of the liver remaining at the end", 0,0,100,2, &ok);
+    double volume_entered= QInputDialog::getDouble(this,"volume of the liver", "Enter the volume of the liver remaining at the end", 0,0,1,2, &ok);
     if (ok)
     {
         ok=false;
@@ -70,8 +78,8 @@ void mainwindow::enterDatas()
         {
             volume=volume_entered;
             margin=margin_entered;
-            select_tumor->setEnabled(true);
-            penWidthAct->setEnabled(true);
+            std::cout<<"The volume of the margin is : "<<margiumLiver(scribbleArea->getImage(),margin)<<std::endl;
+            compute_algorithm1->setEnabled(true);
             return;
         }
         else
@@ -85,26 +93,65 @@ void mainwindow::enterDatas()
     }
 }
 
-void mainwindow::computeAlgorithm()
+void mainwindow::computeAlgorithm1()
 {
-    std::cout<<"Le volume tech1 est de "<<scribbleArea->computeAlgorithm1()<<std::endl;
-    if(scribbleArea->computeAlgorithm1()>volume)
+    double pourcentage_liver=1-scribbleArea->computeAlgorithm1(margin);
+    if(pourcentage_liver>volume)
     {
-        QMessageBox::information(this, "Result", "Tee volume remaining is "/*+scribbleArea->computeAlgorithm1()+". You can simply do the technique number 1"*/);
+        std::string message="The volume remaining is ";
+        message.append(std::to_string(pourcentage_liver));
+        message.append(". You can simply do the technique number 1");
+        QMessageBox::information(this, "Result", message.c_str());
         return;
     }
-    if(scribbleArea->computeAlgorithm2()>volume)
+    QMessageBox::information(this, "Result", "Click on the option : technique number 2");
+    technique2->setEnabled(true);
+}
+
+void mainwindow::computeAlgorithm2()
+{
+    bool ok=false;
+    int part_of_liver=-1;
+    while(part_of_liver!=0&&part_of_liver!=1){
+        part_of_liver= QInputDialog::getInt(this,"Part of the liver", "Choose the part of the liver which must increase (1 for the low part, 0 for the high part)", 0,0,1,0, &ok);
+        if((part_of_liver!=0&&part_of_liver!=1)&&ok)
+        {
+            QMessageBox::warning(this,"wrong number","The integer entered must be 0 or 1");
+        }
+    }
+    if(ok)
     {
-        QMessageBox::information(this, "Result", "Tee volume remaining is "/*+scribbleArea->computeAlgorithm2()+". You can simply do the technique number 2"*/);
-        return;
+        double pourcentage_liver=1-scribbleArea->computeAlgorithm2(margin,part_of_liver);
+        if(pourcentage_liver>volume)
+        {
+            std::string message="The volume remaining is ";
+            message.append(std::to_string(pourcentage_liver));
+            message.append(". You can simply do the technique number 2");
+            QMessageBox::information(this, "Result", message.c_str());
+            return;
+        }
     }
 }
 
 void mainwindow::selectTumor()
 {
     scribbleArea->setImageLoaded(true);
+    scribbleArea->setPenColor(Qt::blue);
+}
+
+void mainwindow::selectLiver()
+{
+    scribbleArea->setImageLoaded(true);
+    scribbleArea->setPenColor(Qt::green);
+}
+
+void mainwindow::separationLiver()
+{
+    penWidthAct->setEnabled(false);
+    scribbleArea->setPenWidth(1);
+    scribbleArea->setImageLoaded(true);
     scribbleArea->setPenColor(Qt::red);
-    compute_algorithm->setEnabled(true);
+    compute_algorithm2->setEnabled(true);
 }
 
 void mainwindow::penWidth()
@@ -146,9 +193,21 @@ void mainwindow::createActions()
     select_tumor->setEnabled(false);
     connect(select_tumor, SIGNAL(triggered()), this, SLOT(selectTumor()));
 
-    compute_algorithm=new QAction(tr("&Compute algorithm"), this);
-    compute_algorithm->setEnabled(false);
-    connect(compute_algorithm, SIGNAL(triggered()), this, SLOT(computeAlgorithm()));
+    select_liver=new QAction(tr("&Select Liver"), this);
+    select_liver->setEnabled(false);
+    connect(select_liver, SIGNAL(triggered()), this, SLOT(selectLiver()));
+
+    compute_algorithm1=new QAction(tr("&Compute algorithm 1"), this);
+    compute_algorithm1->setEnabled(false);
+    connect(compute_algorithm1, SIGNAL(triggered()), this, SLOT(computeAlgorithm1()));
+
+    compute_algorithm2=new QAction(tr("&Compute algorithm 2"), this);
+    compute_algorithm2->setEnabled(false);
+    connect(compute_algorithm2, SIGNAL(triggered()), this, SLOT(computeAlgorithm2()));
+
+    technique2=new QAction(tr("&Technique number 2"), this);
+    technique2->setEnabled(false);
+    connect(technique2, SIGNAL(triggered()), this, SLOT(separationLiver()));
 
     penWidthAct = new QAction(tr("Pen &Width"), this);
     penWidthAct->setEnabled(false);
@@ -175,7 +234,10 @@ void mainwindow::createMenus()
     optionMenu = new QMenu(tr("&Options"), this);
     optionMenu->addAction(input_datas);
     optionMenu->addAction(select_tumor);
-    optionMenu->addAction(compute_algorithm);
+    optionMenu->addAction(select_liver);
+    optionMenu->addAction(compute_algorithm1);
+    optionMenu->addAction(technique2);
+    optionMenu->addAction(compute_algorithm2);
     optionMenu->addAction(penWidthAct);
     optionMenu->addSeparator();
     optionMenu->addAction(clearScreenAct);

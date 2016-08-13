@@ -31,30 +31,23 @@ QImage scribble::getImage()
 bool scribble::openFile(const QString &fileName)
 {
     QImage loadedImage;
-    if(isDicom(fileName.toStdString()))
-    {
-        // transform the name of the file from .dcm to .jpg and the file from dicom to jpeg and load the new jpeg image
-        std::string fileName1_str=changeDicomToJpeg(fileName.toStdString());
-        transformation(fileName.toStdString(),fileName1_str);
-        QString fileName1(fileName1_str.c_str());
-        if (!loadedImage.load(fileName1)){
+    if (!loadedImage.load(fileName)){
         return false;
-        }
-        //resize the image to the size of the scribble
-        QSize newSize = loadedImage.size().expandedTo(size());
-        resizeImage(&loadedImage, newSize);
-        image = loadedImage;
-
-        // and add an image to the slider
-        array[array_counter]=fileName;
-        array_image[array_counter]=image;
-        array_counter++;
-        slider->setMaximum(array_counter-1);
-        //slider->
-
-        modified = false;
-        update();
     }
+        //resize the image to the size of the scribble
+    QSize newSize = loadedImage.size().expandedTo(size());
+    resizeImage(&loadedImage, newSize);
+    image = loadedImage;
+
+    // and add an image to the slider
+    array[array_counter]=fileName;
+    array_image[array_counter]=image;
+    array_counter++;
+    slider->setMaximum(array_counter-1);
+
+
+    modified = false;
+    update();
 
     return true;
 }
@@ -66,14 +59,10 @@ bool scribble::openFolder(const QString &directoryName)
     QStringList list_all_files=myDir.entryList();
     for(int i=0;i<list_all_files.length();i++)
     {
-        std::cout<<"enter in the files number "<<i<<std::endl;
-        if(isDicom(list_all_files.at(i).toStdString()))
-        {
+        std::cout<<list_all_files.at(i).toStdString()<<std::endl;
+        if(isJpg(list_all_files.at(i).toStdString()) || isPng(list_all_files.at(i).toStdString())){
             std::string fileName=directoryName.toStdString()+"/"+list_all_files.at(i).toStdString();
-            // transform the name of the file from .dcm to .jpg and the file from dicom to jpeg and load the new jpeg image
-            std::string fileName1_str=changeDicomToJpeg(fileName);
-            transformation(fileName,fileName1_str);
-            QString fileName1(fileName1_str.c_str());
+            QString fileName1(fileName.c_str());
             if (!loadedImage.load(fileName1)){
                 return false;
             }
@@ -87,10 +76,9 @@ bool scribble::openFolder(const QString &directoryName)
             array_image[array_counter]=image;
             array_counter++;
             slider->setMaximum(array_counter-1);
-            //slider->
 
-            modified = false;
-            update();
+        modified = false;
+        update();
         }
     }
     return true;
@@ -207,25 +195,30 @@ void scribble::display_image(int number_image)
     update();
 }
 
-double scribble::computeAlgorithm1()
+double scribble::computeAlgorithm1(int margin)
 {
     double volume_final=0;
+    double volume_liver=0;
+    double volume_tumor=0;
     for(int i=0;i<array_counter;i++)
     {
-        volume_final= volume_final+getVolumeTumor(array_image[i])/(double)(getVolumeLiver(array_image[i])+getVolumeTumor(array_image[i]));
+        volume_liver=volume_liver+getVolumeLiver(array_image[i]);
+        volume_tumor=volume_tumor+getVolumeTumor(array_image[i],margin);
     }
-    volume_final=volume_final/array_counter;
+    volume_final=volume_tumor/(volume_tumor+volume_liver);
     return volume_final;
 }
 
-double scribble::computeAlgorithm2()
+double scribble::computeAlgorithm2(int margin, int part)
 {
     double volume_final=0;
-    setPenColor(Qt::green);
+    double volume_liver=0;
+    double volume_tumor=0;
     for(int i=0;i<array_counter;i++)
     {
-        volume_final=volume_final+getVolumeTumor(array_image[i])/(double) (getVolumeAfterSeparation(array_image[i]));
+        volume_liver=volume_liver+getVolumeAfterSeparation(array_image[i],part);
+        volume_tumor=volume_tumor+getVolumeTumor(array_image[i],margin);
     }
-    volume_final=volume_final/array_counter;
+    volume_final=volume_tumor/(volume_tumor+volume_liver);
     return volume_final;
 }

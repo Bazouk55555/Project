@@ -252,3 +252,43 @@ bool isDicom(std::string file)
     }
     return true;
 }
+
+bool isJpg(std::string file){
+    if(file.c_str()[file.length()-1]!='g')
+    {
+        return false;
+    }
+    if(file.c_str()[file.length()-2]!='p')
+    {
+        return false;
+    }
+    if(file.c_str()[file.length()-3]!='j')
+    {
+        return false;
+    }
+    if(file.c_str()[file.length()-4]!='.')
+    {
+       return false;
+    }
+    return true;
+}
+
+bool isPng(std::string file){
+    if(file.c_str()[file.length()-1]!='g')
+    {
+        return false;
+    }
+    if(file.c_str()[file.length()-2]!='n')
+    {
+        return false;
+    }
+    if(file.c_str()[file.length()-3]!='p')
+    {
+        return false;
+    }
+    if(file.c_str()[file.length()-4]!='.')
+    {
+       return false;
+    }
+    return true;
+}

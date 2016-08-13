@@ -21,8 +21,8 @@ public:
     void setPenColor(const QColor &newColor);
     void setPenWidth(int newWidth);
     void setImageLoaded(bool loaded);
-    double computeAlgorithm1();
-    double computeAlgorithm2();
+    double computeAlgorithm1(int margin);
+    double computeAlgorithm2(int margin, int part);
 
     bool isModified() const { return modified; }
     QColor penColor() const { return myPenColor; }

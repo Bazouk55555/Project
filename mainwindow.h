@@ -21,8 +21,11 @@ private slots:
     void openFile();
     void save();
     void enterDatas();
-    void computeAlgorithm();
+    void computeAlgorithm1();
+    void computeAlgorithm2();
     void selectTumor();
+    void selectLiver();
+    void separationLiver();
     void penWidth();
 
 private:
@@ -42,8 +45,11 @@ private:
     QList<QAction *> saveAsActs;
     QAction *exitAct;
     QAction *input_datas;
-    QAction *compute_algorithm;
+    QAction *compute_algorithm1;
+    QAction *compute_algorithm2;
+    QAction *technique2;
     QAction *select_tumor;
+    QAction *select_liver;
     QAction *penWidthAct;
     QAction *clearScreenAct;
 

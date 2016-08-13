@@ -9,4 +9,6 @@ void outputDatasetTags(ptr<dataSet> dataset, std::wstring prefix);
 int transformation(std::string source, std::string destination);
 std::string changeDicomToJpeg(std::string dicom);
 bool isDicom(std::string file);
+bool isPng(std::string file);
+bool isJpg(std::string file);
 #endif // TRANSFORM_2_JPEG_H
