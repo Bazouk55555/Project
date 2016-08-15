@@ -65,6 +65,11 @@ void mainwindow::save()
     saveFile(fileFormat);
 }
 
+void mainwindow::segment()
+{
+    system("python C:/Users/User/Desktop/project.py");
+}
+
 //To enter the datas margin and volume expected
 void mainwindow::enterDatas()
 {
@@ -185,6 +190,9 @@ void mainwindow::createActions()
     exitAct = new QAction(tr("&Exit"), this);
     connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
 
+    segmentation= new QAction(tr("&Segmentation"), this);
+    connect(segmentation, SIGNAL(triggered()), this, SLOT(segment()));
+
     input_datas= new QAction(tr("&Input Data"), this);
     input_datas->setEnabled(false);
     connect(input_datas, SIGNAL(triggered()), this, SLOT(enterDatas()));
@@ -232,6 +240,7 @@ void mainwindow::createMenus()
     fileMenu->addAction(exitAct);
 
     optionMenu = new QMenu(tr("&Options"), this);
+    optionMenu->addAction(segmentation);
     optionMenu->addAction(input_datas);
     optionMenu->addAction(select_tumor);
     optionMenu->addAction(select_liver);

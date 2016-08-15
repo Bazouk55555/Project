@@ -20,6 +20,7 @@ private slots:
     void openFolder();
     void openFile();
     void save();
+    void segment();
     void enterDatas();
     void computeAlgorithm1();
     void computeAlgorithm2();
@@ -44,6 +45,7 @@ private:
     QAction *openAct2;
     QList<QAction *> saveAsActs;
     QAction *exitAct;
+    QAction *segmentation;
     QAction *input_datas;
     QAction *compute_algorithm1;
     QAction *compute_algorithm2;
