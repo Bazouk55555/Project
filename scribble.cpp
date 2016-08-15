@@ -52,6 +52,42 @@ bool scribble::openFile(const QString &fileName)
     return true;
 }
 
+bool scribble::openFolderDicom(const QString &directoryName)
+{
+    QImage loadedImage;
+    QDir myDir(directoryName);
+    QStringList list_all_files=myDir.entryList();
+    for(int i=0;i<list_all_files.length();i++)
+    {
+        if(isDicom(list_all_files.at(i).toStdString()))
+        {
+            std::string fileName=directoryName.toStdString()+"/"+list_all_files.at(i).toStdString();
+            // transform the name of the file from .dcm to .jpg and the file from dicom to jpeg and load the new jpeg image
+            std::string fileName1_str=changeDicomToJpeg(fileName);
+            transformation(fileName,fileName1_str);
+            QString fileName1(fileName1_str.c_str());
+            if (!loadedImage.load(fileName1)){
+                return false;
+            }
+            //resize the image to the size of the scribble
+            QSize newSize = loadedImage.size().expandedTo(size());
+            resizeImage(&loadedImage, newSize);
+            image = loadedImage;
+
+            // and an image to the slider
+            array[array_counter]=list_all_files.at(i);
+            array_image[array_counter]=image;
+            array_counter++;
+            slider->setMaximum(array_counter-1);
+            //slider->
+
+            modified = false;
+            update();
+        }
+    }
+    return true;
+}
+
 bool scribble::openFolder(const QString &directoryName)
 {
     QImage loadedImage;

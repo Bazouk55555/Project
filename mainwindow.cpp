@@ -26,7 +26,23 @@ void mainwindow::closeEvent(QCloseEvent *event)
     }
 }
 
-//To open a folder with Dicom images
+void mainwindow::openFolderDicom()
+{
+    if (maybeSave()) {
+        QString directory = QFileDialog::getExistingDirectory(this);
+        if (!directory.isEmpty())
+        {
+            scribbleArea->openFolderDicom(directory);
+            directory_segmentation=directory.toStdString();
+            input_datas->setEnabled(true);
+            select_tumor->setEnabled(true);
+            select_liver->setEnabled(true);
+            penWidthAct->setEnabled(true);
+        }
+    }
+}
+
+//To open a folder with JPG images segmented
 void mainwindow::openFolder()
 {
     if (maybeSave()) {
@@ -42,7 +58,7 @@ void mainwindow::openFolder()
     }
 }
 
-//To open a Dicom image file
+//To open a an image file
 void mainwindow::openFile()
 {
     if (maybeSave()) {
@@ -67,7 +83,9 @@ void mainwindow::save()
 
 void mainwindow::segment()
 {
-    system("python C:/Users/User/Desktop/project.py");
+    std::string command="python C:/Users/User/Desktop/project.py ";
+    command.append(directory_segmentation);
+    system(command.c_str());
 }
 
 //To enter the datas margin and volume expected
@@ -172,6 +190,9 @@ void mainwindow::penWidth()
 
 void mainwindow::createActions()
 {
+    openDicom = new QAction(tr("&Open Dicom Folder"), this);
+    connect(openDicom, SIGNAL(triggered()), this, SLOT(openFolderDicom()));
+
     openAct = new QAction(tr("&Open Folder"), this);
     connect(openAct, SIGNAL(triggered()), this, SLOT(openFolder()));
 
@@ -233,6 +254,7 @@ void mainwindow::createMenus()
         saveAsMenu->addAction(action);
 
     fileMenu = new QMenu(tr("&File"), this);
+    fileMenu->addAction(openDicom);
     fileMenu->addAction(openAct);
     fileMenu->addAction(openAct2);
     fileMenu->addMenu(saveAsMenu);

@@ -18,6 +18,8 @@ public:
     //Return the image
     QImage getImage();
 
+    bool openFolderDicom(const QString &directoryName);
+
     // Open a jpg or png file
     bool openFile(const QString &fileName);
 

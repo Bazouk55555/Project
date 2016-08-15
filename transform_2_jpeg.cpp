@@ -58,7 +58,7 @@ bool isPng(std::string file){
 
 //All this code was used to transform a dicom image to a jpeg using Imebra library. It is not useful anymore but it can be in the future
 
-/*
+
 using namespace puntoexe;
 using namespace puntoexe::imebra;
 
@@ -282,5 +282,5 @@ bool isDicom(std::string file)
        return false;
     }
     return true;
-}*/
+}
 

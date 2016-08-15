@@ -17,6 +17,7 @@ protected:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
 
 private slots:
+    void openFolderDicom();
     void openFolder();
     void openFile();
     void save();
@@ -34,13 +35,14 @@ private:
     void createMenus();
     bool maybeSave();
     bool saveFile(const QByteArray &fileFormat);
+    std::string directory_segmentation;
 
     scribble *scribbleArea;
 
     QMenu *saveAsMenu;
     QMenu *fileMenu;
     QMenu *optionMenu;
-
+    QAction *openDicom;
     QAction *openAct;
     QAction *openAct2;
     QList<QAction *> saveAsActs;
