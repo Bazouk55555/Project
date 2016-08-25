@@ -21,6 +21,8 @@ private slots:
     void openFolder();
     void openFile();
     void save();
+    void displayIn3D();
+    void displayJPGIn3D();
     void segment();
     void enterDatas();
     void computeAlgorithm1();
@@ -35,7 +37,8 @@ private:
     void createMenus();
     bool maybeSave();
     bool saveFile(const QByteArray &fileFormat);
-    std::string directory_segmentation;
+    std::string directory_dicom;
+    QString directory_segmentation;
 
     scribble *scribbleArea;
 
@@ -47,6 +50,8 @@ private:
     QAction *openAct2;
     QList<QAction *> saveAsActs;
     QAction *exitAct;
+    QAction *display_dicom_in_3d;
+    QAction *display_segmentation_in_3d;
     QAction *segmentation;
     QAction *input_datas;
     QAction *compute_algorithm1;

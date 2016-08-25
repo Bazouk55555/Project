@@ -33,11 +33,13 @@ void mainwindow::openFolderDicom()
         if (!directory.isEmpty())
         {
             scribbleArea->openFolderDicom(directory);
-            directory_segmentation=directory.toStdString();
+            directory_dicom=directory.toStdString();
             input_datas->setEnabled(true);
             select_tumor->setEnabled(true);
             select_liver->setEnabled(true);
             penWidthAct->setEnabled(true);
+            display_dicom_in_3d->setEnabled(true);
+            segmentation->setEnabled(true);
         }
     }
 }
@@ -54,6 +56,7 @@ void mainwindow::openFolder()
             select_tumor->setEnabled(true);
             select_liver->setEnabled(true);
             penWidthAct->setEnabled(true);
+            display_segmentation_in_3d->setEnabled(true);
         }
     }
 }
@@ -81,18 +84,42 @@ void mainwindow::save()
     saveFile(fileFormat);
 }
 
+void mainwindow::displayIn3D()
+{
+    std::string command="ipython C:/Users/User/Desktop/testpy.py ";
+    scribbleArea->clearImage();
+    command.append(directory_dicom);
+    system(command.c_str());
+}
+
+void mainwindow::displayJPGIn3D()
+{
+    std::string command="ipython C:/Users/User/Desktop/testpy2.py ";
+    scribbleArea->clearImage();
+    command.append(directory_segmentation.toStdString());
+    system(command.c_str());
+}
+
 void mainwindow::segment()
 {
-    std::string command="python C:/Users/User/Desktop/project.py ";
-    command.append(directory_segmentation);
+    std::string command="ipython C:/Users/User/Desktop/project.py ";
+    scribbleArea->clearImage();
+    QString directory = QFileDialog::getExistingDirectory(this);
+    directory_segmentation=directory;
+    command.append(directory_dicom);
+    command.append(" ");
+    command.append(directory_segmentation.toStdString());
+    std::cout<<command<<" lol!!!!!"<<std::endl;
     system(command.c_str());
+    scribbleArea->openFolder(directory_segmentation);
+    display_segmentation_in_3d->setEnabled(true);
 }
 
 //To enter the datas margin and volume expected
 void mainwindow::enterDatas()
 {
     bool ok=false;
-    double volume_entered= QInputDialog::getDouble(this,"volume of the liver", "Enter the volume of the liver remaining at the end", 0,0,1,2, &ok);
+    double volume_entered= QInputDialog::getDouble(this,"Volume of the liver", "Enter the volume of the liver remaining at the end", 0,0,1,2, &ok);
     if (ok)
     {
         ok=false;
@@ -123,11 +150,11 @@ void mainwindow::computeAlgorithm1()
     {
         std::string message="The volume remaining is ";
         message.append(std::to_string(pourcentage_liver));
-        message.append(". You can simply do the technique number 1");
+        message.append(". A direct removal of the tuumor from the liver can be maid");
         QMessageBox::information(this, "Result", message.c_str());
         return;
     }
-    QMessageBox::information(this, "Result", "Click on the option : technique number 2");
+    QMessageBox::information(this, "Result", "Click on the option : Choose vein intersection to continue");
     technique2->setEnabled(true);
 }
 
@@ -149,7 +176,7 @@ void mainwindow::computeAlgorithm2()
         {
             std::string message="The volume remaining is ";
             message.append(std::to_string(pourcentage_liver));
-            message.append(". You can simply do the technique number 2");
+            message.append(". A PVE can be maid");
             QMessageBox::information(this, "Result", message.c_str());
             return;
         }
@@ -193,7 +220,7 @@ void mainwindow::createActions()
     openDicom = new QAction(tr("&Open Dicom Folder"), this);
     connect(openDicom, SIGNAL(triggered()), this, SLOT(openFolderDicom()));
 
-    openAct = new QAction(tr("&Open Folder"), this);
+    openAct = new QAction(tr("&Open Jpg segmented images Folder"), this);
     connect(openAct, SIGNAL(triggered()), this, SLOT(openFolder()));
 
     openAct2 = new QAction(tr("&Open File"), this);
@@ -211,7 +238,16 @@ void mainwindow::createActions()
     exitAct = new QAction(tr("&Exit"), this);
     connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
 
+    display_dicom_in_3d = new QAction(tr("&Display non segmented images in 3d"), this);
+    display_dicom_in_3d->setEnabled(false);
+    connect(display_dicom_in_3d, SIGNAL(triggered()), this, SLOT(displayIn3D()));
+
+    display_segmentation_in_3d = new QAction(tr("&Display segmented images in 3d"), this);
+    display_segmentation_in_3d->setEnabled(false);
+    connect(display_segmentation_in_3d, SIGNAL(triggered()), this, SLOT(displayJPGIn3D()));
+
     segmentation= new QAction(tr("&Segmentation"), this);
+    segmentation->setEnabled(false);
     connect(segmentation, SIGNAL(triggered()), this, SLOT(segment()));
 
     input_datas= new QAction(tr("&Input Data"), this);
@@ -226,15 +262,15 @@ void mainwindow::createActions()
     select_liver->setEnabled(false);
     connect(select_liver, SIGNAL(triggered()), this, SLOT(selectLiver()));
 
-    compute_algorithm1=new QAction(tr("&Compute algorithm 1"), this);
+    compute_algorithm1=new QAction(tr("&Compute direct removal of the tumor"), this);
     compute_algorithm1->setEnabled(false);
     connect(compute_algorithm1, SIGNAL(triggered()), this, SLOT(computeAlgorithm1()));
 
-    compute_algorithm2=new QAction(tr("&Compute algorithm 2"), this);
+    compute_algorithm2=new QAction(tr("&Compute PVE"), this);
     compute_algorithm2->setEnabled(false);
     connect(compute_algorithm2, SIGNAL(triggered()), this, SLOT(computeAlgorithm2()));
 
-    technique2=new QAction(tr("&Technique number 2"), this);
+    technique2=new QAction(tr("&Chose intersection vein points"), this);
     technique2->setEnabled(false);
     connect(technique2, SIGNAL(triggered()), this, SLOT(separationLiver()));
 
@@ -262,6 +298,8 @@ void mainwindow::createMenus()
     fileMenu->addAction(exitAct);
 
     optionMenu = new QMenu(tr("&Options"), this);
+    optionMenu->addAction(display_dicom_in_3d);
+    optionMenu->addAction(display_segmentation_in_3d);
     optionMenu->addAction(segmentation);
     optionMenu->addAction(input_datas);
     optionMenu->addAction(select_tumor);

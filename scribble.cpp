@@ -56,11 +56,13 @@ bool scribble::openFolderDicom(const QString &directoryName)
 {
     QImage loadedImage;
     QDir myDir(directoryName);
+    //myDir.setSorting(QDir::Unsorted);
     QStringList list_all_files=myDir.entryList();
     for(int i=0;i<list_all_files.length();i++)
     {
         if(isDicom(list_all_files.at(i).toStdString()))
         {
+            std::cout<<"here the dicon image called: "<<list_all_files.at(i).toStdString()<<std::endl;
             std::string fileName=directoryName.toStdString()+"/"+list_all_files.at(i).toStdString();
             // transform the name of the file from .dcm to .jpg and the file from dicom to jpeg and load the new jpeg image
             std::string fileName1_str=changeDicomToJpeg(fileName);
@@ -85,6 +87,17 @@ bool scribble::openFolderDicom(const QString &directoryName)
             update();
         }
     }
+    /*if (!loadedImage.load(array[0])){
+        std::cout<<"t es une merdeeeeeeeeeeeeeeeeeeeeeeeeeee"<<std::endl;
+    }
+    QSize newSize = loadedImage.size().expandedTo(size());
+    resizeImage(&loadedImage, newSize);
+    image=loadedImage;
+    update();*/
+    slider->setSliderPosition(slider->maximum());
+    /*for(int i=0;i<array_counter;i++){
+        std::cout<<"here the dicon image called: "<<array[i].toStdString()<<std::endl;
+    }*/
     return true;
 }
 
@@ -153,7 +166,24 @@ void scribble::clearImage()
     image.fill(qRgb(255, 255, 255));
     modified = true;
     update();
+    QImage *imagebis=new QImage();
+    image=*imagebis;
+    for(int i=0;i<array_counter;i++)
+    {
+        array_image[i]=*imagebis;
+        array[i]="";
+    }
+    array_counter=0;
+    slider->setMaximum(array_counter);
+    delete imagebis;
 }
+
+/*void scribble::clearEverything()
+{
+    image.fill(qRgb(255, 255, 255));
+    modified = true;
+    update();
+}*/
 
 void scribble::mousePressEvent(QMouseEvent *event)
 {

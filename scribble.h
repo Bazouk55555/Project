@@ -58,6 +58,9 @@ public slots:
     // Clear the image
     void clearImage();
 
+    // Clear all the images
+    //void clearEverything();
+
     // Display the image
     void display_image(int);
 
