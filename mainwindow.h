@@ -30,6 +30,7 @@ private slots:
     void selectTumor();
     void selectLiver();
     void separationLiver();
+    void separationLiverBis();
     void penWidth();
 
 private:

@@ -14,7 +14,8 @@ mainwindow::mainwindow()
     createMenus();
 
     setWindowTitle(tr("Liver Surgery Helping"));
-    resize(500, 500);
+    resize(1000, 1000);
+    //std::cout<<"the width of the scribble is: "<<scribbleArea->size().width()<<" and the height is: "<<scribbleArea->size().height()<<std::endl;
 }
 
 void mainwindow::closeEvent(QCloseEvent *event)
@@ -66,6 +67,7 @@ void mainwindow::openFile()
 {
     if (maybeSave()) {
         QString fileName = QFileDialog::getOpenFileName(this);
+        //std::cout<<"et ici scribble vaut ("<<scribbleArea->size().width()<<","<<scribbleArea->size().height()<<")"<<std::endl;
         if (!fileName.isEmpty())
         {
             scribbleArea->openFile(fileName);
@@ -109,7 +111,7 @@ void mainwindow::segment()
     command.append(directory_dicom);
     command.append(" ");
     command.append(directory_segmentation.toStdString());
-    std::cout<<command<<" lol!!!!!"<<std::endl;
+    //std::cout<<command<<" lol!!!!!"<<std::endl;
     system(command.c_str());
     scribbleArea->openFolder(directory_segmentation);
     display_segmentation_in_3d->setEnabled(true);
@@ -128,7 +130,7 @@ void mainwindow::enterDatas()
         {
             volume=volume_entered;
             margin=margin_entered;
-            std::cout<<"The volume of the margin is : "<<margiumLiver(scribbleArea->getImage(),margin)<<std::endl;
+            //std::cout<<"The volume of the margin is : "<<margiumLiver(scribbleArea->getImage(),margin)<<std::endl;
             compute_algorithm1->setEnabled(true);
             return;
         }
@@ -194,8 +196,17 @@ void mainwindow::selectLiver()
     scribbleArea->setImageLoaded(true);
     scribbleArea->setPenColor(Qt::green);
 }
-
-void mainwindow::separationLiver()
+void mainwindow::separationLiver(){
+    //std::cout<<"je suis a 1"<<std::endl;
+    //std::cout<<"je suis a 2"<<std::endl;
+    penWidthAct->setEnabled(false);
+    scribbleArea->setPenWidth(1);
+    scribbleArea->setImageLoaded(true);
+    scribbleArea->setPenColor(Qt::red);
+    penWidthAct->setEnabled(true);
+    compute_algorithm2->setEnabled(true);
+}
+void mainwindow::separationLiverBis()
 {
     penWidthAct->setEnabled(false);
     scribbleArea->setPenWidth(1);

@@ -53,6 +53,9 @@ public:
     // Return the width of the pen
     int penWidth() const { return myPenWidth; }
 
+    int getCountPoints();
+    void drawSimpleLineTo(const QPoint &a, const QPoint &b);
+
 public slots:
 
     // Clear the image
@@ -86,6 +89,8 @@ private:
     // Draw at the point indicated
     void drawLineTo(const QPoint &endPoint);
 
+    void drawPointTo(const QPoint &Point);
+
     // Resize the image
     void resizeImage(QImage *image, const QSize &newSize);
 
@@ -106,6 +111,9 @@ private:
     int array_counter;
     QPoint lastPoint;
     QSlider *slider;
+    int countPoints;
+    QPoint pointA;
+    QPoint pointB;
 
 };
 

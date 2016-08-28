@@ -18,7 +18,9 @@ scribble::scribble(QWidget *parent)
     slider=new QSlider(Qt::Horizontal,this);
     array_counter=0;
     slider->setMaximum(array_counter);
+    countPoints=0;
     QObject::connect(slider, SIGNAL(valueChanged(int)), this, SLOT(display_image(int))) ;
+    //std::cout<<"mais la au const size vaut ("<<size().width()<<","<<size().height()<<")"<<std::endl;
 
 }
 
@@ -35,10 +37,14 @@ bool scribble::openFile(const QString &fileName)
         return false;
     }
         //resize the image to the size of the scribble
+    //std::cout<<"1: la width: "<<loadedImage.width()<<" et la height "<<loadedImage.height()<<std::endl;
     QSize newSize = loadedImage.size().expandedTo(size());
     resizeImage(&loadedImage, newSize);
+    //std::cout<<"2:la widht: "<<loadedImage.width()<<" et la height "<<loadedImage.height()<<std::endl;
+    //std::cout<<"et size vaut ("<<size().width()<<","<<size().height()<<")"<<std::endl;
+    //std::cout<<"et scribble vaut ("<<this->size().width()<<","<<this->size().height()<<")"<<std::endl;
     image = loadedImage;
-
+    //std::cout<<"2:la image widht: "<<image.width()<<" et la height "<<image.height()<<std::endl;
     // and add an image to the slider
     array[array_counter]=fileName;
     array_image[array_counter]=image;
@@ -81,23 +87,13 @@ bool scribble::openFolderDicom(const QString &directoryName)
             array_image[array_counter]=image;
             array_counter++;
             slider->setMaximum(array_counter-1);
-            //slider->
 
             modified = false;
             update();
         }
     }
-    /*if (!loadedImage.load(array[0])){
-        std::cout<<"t es une merdeeeeeeeeeeeeeeeeeeeeeeeeeee"<<std::endl;
-    }
-    QSize newSize = loadedImage.size().expandedTo(size());
-    resizeImage(&loadedImage, newSize);
-    image=loadedImage;
-    update();*/
     slider->setSliderPosition(slider->maximum());
-    /*for(int i=0;i<array_counter;i++){
-        std::cout<<"here the dicon image called: "<<array[i].toStdString()<<std::endl;
-    }*/
+    //std::cout<<"the width of the image is: "<<image.width()<<" and the height is: "<<image.height()<<std::endl;
     return true;
 }
 
@@ -178,24 +174,39 @@ void scribble::clearImage()
     delete imagebis;
 }
 
-/*void scribble::clearEverything()
-{
-    image.fill(qRgb(255, 255, 255));
-    modified = true;
-    update();
-}*/
+int scribble::getCountPoints(){
+    return countPoints;
+}
 
 void scribble::mousePressEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton && image_loaded) {
+    //std::cout<<"je suis a 3"<<std::endl;
+    if (event->button() == Qt::LeftButton && image_loaded && myPenColor!=Qt::red) {
         lastPoint = event->pos();
         scribbling = true;
+    }
+    //std::cout<<"je suis a 4"<<std::endl;
+    if(myPenColor==Qt::red && countPoints<2)
+    {
+        //std::cout<<"je suis a 5"<<std::endl;
+        drawPointTo(event->pos());
+        if(countPoints==0)
+        {
+            pointA.setX(event->pos().x());
+            pointA.setY(event->pos().y());
+        }
+        if(countPoints==1)
+        {
+            pointB.setX(event->pos().x());
+            pointB.setY(event->pos().y());
+        }
+        //std::cout<<"je suis a 6"<<std::endl;
     }
 }
 
 void scribble::mouseMoveEvent(QMouseEvent *event)
 {
-    if ((event->buttons() & Qt::LeftButton) && scribbling && image_loaded && event->pos().x()<image.size().height()&&event->pos().y()<image.size().width())
+    if ((event->buttons() & Qt::LeftButton) && scribbling && image_loaded && event->pos().x()<image.size().height()&&event->pos().y()<image.size().width() && myPenColor!=Qt::red)
     {
         drawLineTo(event->pos());
     }
@@ -208,12 +219,29 @@ void scribble::mouseReleaseEvent(QMouseEvent *event)
         scribbling = false;
         array_image[slider->value()]=image;
     }
+    if (myPenColor==Qt::red && countPoints<2)
+    {
+        countPoints++;
+    }
+    if (myPenColor==Qt::red && countPoints==2)
+    {
+        QPoint pointABis;
+        QPoint pointBBis;
+        pointABis.setX(0);
+        pointABis.setY(pointA.y()-(pointB.y()-pointA.y())/(pointB.x()-pointA.x())*pointA.x());
+        pointBBis.setX(image.width());
+        pointBBis.setY(pointA.y()+(image.width()-pointA.x())*(pointB.y()-pointA.y())/(pointB.x()-pointA.x()));
+        std::cout<<"le point A est:("<<pointABis.x()<<","<<pointABis.y()<<") "<<"le point B est:("<<pointBBis.x()<<","<<pointBBis.y()<<") "<<std::endl;
+        drawSimpleLineTo(pointABis,pointBBis);
+        array_image[slider->value()]=image;
+    }
 }
 
 void scribble::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
     QRect dirtyRect = event->rect();
+    //std::cout<<"where"<<dirtyRect.size().width()<<","<<dirtyRect.height()<<std::endl;
     painter.drawImage(dirtyRect, image/*array_image[array_counter]*/, dirtyRect);
 }
 
@@ -228,6 +256,16 @@ void scribble::resizeEvent(QResizeEvent *event)
     QWidget::resizeEvent(event);
 }
 
+void scribble::drawSimpleLineTo(const QPoint &a, const QPoint &b)
+{
+    QPainter painter(&image/*&array_image[array_counter]*/);
+    painter.setPen(QPen(myPenColor, myPenWidth, Qt::SolidLine, Qt::RoundCap,
+                        Qt::RoundJoin));
+    painter.drawLine(a, b);
+    modified = true;
+    update();
+}
+
 void scribble::drawLineTo(const QPoint &endPoint)
 {
     QPainter painter(&image/*&array_image[array_counter]*/);
@@ -237,6 +275,16 @@ void scribble::drawLineTo(const QPoint &endPoint)
     modified = true;
     update();
     lastPoint = endPoint;
+}
+
+void scribble::drawPointTo(const QPoint &Point)
+{
+    QPainter painter(&image/*&array_image[array_counter]*/);
+    painter.setPen(QPen(myPenColor, myPenWidth, Qt::SolidLine, Qt::RoundCap,
+                        Qt::RoundJoin));
+    painter.drawPoint(Point);
+    modified = true;
+    update();
 }
 
 void scribble::resizeImage(QImage *image, const QSize &newSize)
@@ -274,7 +322,6 @@ double scribble::computeAlgorithm1(int margin)
     volume_final=volume_tumor/(volume_tumor+volume_liver);
     return volume_final;
 }
-
 double scribble::computeAlgorithm2(int margin, int part)
 {
     double volume_final=0;
