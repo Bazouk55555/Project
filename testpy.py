@@ -12,7 +12,6 @@ def reconstitute_volume_dicom(folder):
 	pathDicom = folder
 	reader = SimpleITK.ImageSeriesReader()
 	filenamesDICOM = reader.GetGDCMSeriesFileNames(pathDicom)
-	print filenamesDICOM
 	reader.SetFileNames(filenamesDICOM)
 	imgOriginal = reader.Execute()
 	nda = SimpleITK.GetArrayFromImage(imgOriginal)

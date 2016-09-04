@@ -20,8 +20,6 @@ scribble::scribble(QWidget *parent)
     slider->setMaximum(array_counter);
     countPoints=0;
     QObject::connect(slider, SIGNAL(valueChanged(int)), this, SLOT(display_image(int))) ;
-    //std::cout<<"mais la au const size vaut ("<<size().width()<<","<<size().height()<<")"<<std::endl;
-
 }
 
 QImage scribble::getImage()
@@ -37,14 +35,9 @@ bool scribble::openFile(const QString &fileName)
         return false;
     }
         //resize the image to the size of the scribble
-    //std::cout<<"1: la width: "<<loadedImage.width()<<" et la height "<<loadedImage.height()<<std::endl;
-    QSize newSize = loadedImage.size().expandedTo(size());
-    resizeImage(&loadedImage, newSize);
-    //std::cout<<"2:la widht: "<<loadedImage.width()<<" et la height "<<loadedImage.height()<<std::endl;
-    //std::cout<<"et size vaut ("<<size().width()<<","<<size().height()<<")"<<std::endl;
-    //std::cout<<"et scribble vaut ("<<this->size().width()<<","<<this->size().height()<<")"<<std::endl;
+    //QSize newSize = loadedImage.size().expandedTo(size());
+    //resizeImage(&loadedImage, newSize);
     image = loadedImage;
-    //std::cout<<"2:la image widht: "<<image.width()<<" et la height "<<image.height()<<std::endl;
     // and add an image to the slider
     array[array_counter]=fileName;
     array_image[array_counter]=image;
@@ -58,7 +51,7 @@ bool scribble::openFile(const QString &fileName)
     return true;
 }
 
-bool scribble::openFolderDicom(const QString &directoryName)
+/*bool scribble::openFolderDicom(const QString &directoryName)
 {
     QImage loadedImage;
     QDir myDir(directoryName);
@@ -68,22 +61,24 @@ bool scribble::openFolderDicom(const QString &directoryName)
     {
         if(isDicom(list_all_files.at(i).toStdString()))
         {
-            std::cout<<"here the dicon image called: "<<list_all_files.at(i).toStdString()<<std::endl;
+            std::cout<<"here the dicom image called: "<<list_all_files.at(i).toStdString()<<std::endl;
             std::string fileName=directoryName.toStdString()+"/"+list_all_files.at(i).toStdString();
             // transform the name of the file from .dcm to .jpg and the file from dicom to jpeg and load the new jpeg image
             std::string fileName1_str=changeDicomToJpeg(fileName);
+            std::cout<<"le filename dicom est: "<<fileName<<" alors que le jpg filename est "<<fileName1_str<<std::endl;
             transformation(fileName,fileName1_str);
             QString fileName1(fileName1_str.c_str());
             if (!loadedImage.load(fileName1)){
                 return false;
             }
             //resize the image to the size of the scribble
-            QSize newSize = loadedImage.size().expandedTo(size());
-            resizeImage(&loadedImage, newSize);
+            //QSize newSize = loadedImage.size().expandedTo(size());
+            //resizeImage(&loadedImage, newSize);
             image = loadedImage;
 
             // and an image to the slider
             array[array_counter]=list_all_files.at(i);
+            std::cout<<"array_counter est de "<<array_counter<<" et ce file a pour nom: "<<array[array_counter].toStdString()<<std::endl;
             array_image[array_counter]=image;
             array_counter++;
             slider->setMaximum(array_counter-1);
@@ -93,27 +88,26 @@ bool scribble::openFolderDicom(const QString &directoryName)
         }
     }
     slider->setSliderPosition(slider->maximum());
-    //std::cout<<"the width of the image is: "<<image.width()<<" and the height is: "<<image.height()<<std::endl;
     return true;
-}
+}*/
 
-bool scribble::openFolder(const QString &directoryName)
+bool scribble::openFolderDicom(const QString &directoryName)
 {
+    std::string command="ipython C:/Users/User/Desktop/displaydicom.py ";
+    command.append("C:/Users/User/Desktop/All_liver/TCGA-LIHC/TCGA-BC-A3KG/1.3.6.1.4.1.14519.5.2.1.8421.4008.303533339368406310446855637599/1.3.6.1.4.1.14519.5.2.1.8421.4008.807354510232772395197490232364");
+    system(command.c_str());
+    QString directoryName1=QString::fromStdString("C:/Users/User/Desktop/DicomImages");
     QImage loadedImage;
-    QDir myDir(directoryName);
+    QDir myDir(directoryName1);
     QStringList list_all_files=myDir.entryList();
     for(int i=0;i<list_all_files.length();i++)
     {
-        std::cout<<list_all_files.at(i).toStdString()<<std::endl;
         if(isJpg(list_all_files.at(i).toStdString()) || isPng(list_all_files.at(i).toStdString())){
-            std::string fileName=directoryName.toStdString()+"/"+list_all_files.at(i).toStdString();
+            std::string fileName=directoryName1.toStdString()+"/"+list_all_files.at(i).toStdString();
             QString fileName1(fileName.c_str());
             if (!loadedImage.load(fileName1)){
                 return false;
             }
-            //resize the image to the size of the scribble
-            QSize newSize = loadedImage.size().expandedTo(size());
-            resizeImage(&loadedImage, newSize);
             image = loadedImage;
 
             // and an image to the slider
@@ -126,13 +120,46 @@ bool scribble::openFolder(const QString &directoryName)
         update();
         }
     }
+    slider->setSliderPosition(slider->maximum());
+    return true;
+}
+
+bool scribble::openFolder(const QString &directoryName)
+{
+    QImage loadedImage;
+    QDir myDir(directoryName);
+    QStringList list_all_files=myDir.entryList();
+    for(int i=0;i<list_all_files.length();i++)
+    {
+        if(isJpg(list_all_files.at(i).toStdString()) || isPng(list_all_files.at(i).toStdString())){
+            std::string fileName=directoryName.toStdString()+"/"+list_all_files.at(i).toStdString();
+            QString fileName1(fileName.c_str());
+            if (!loadedImage.load(fileName1)){
+                return false;
+            }
+            //resize the image to the size of the scribble
+            //QSize newSize = loadedImage.size().expandedTo(size());
+            //resizeImage(&loadedImage, newSize);
+            image = loadedImage;
+
+            // and an image to the slider
+            array[array_counter]=list_all_files.at(i);
+            array_image[array_counter]=image;
+            array_counter++;
+            slider->setMaximum(array_counter-1);
+
+        modified = false;
+        update();
+        }
+    }
+    slider->setSliderPosition(slider->maximum());
     return true;
 }
 
 bool scribble::saveImage(const QString &fileName, const char *fileFormat)
 {
     QImage visibleImage = image;
-    resizeImage(&visibleImage, size());
+    //resizeImage(&visibleImage, size());
 
     if (visibleImage.save(fileName, fileFormat)) {
         modified = false;
@@ -180,15 +207,12 @@ int scribble::getCountPoints(){
 
 void scribble::mousePressEvent(QMouseEvent *event)
 {
-    //std::cout<<"je suis a 3"<<std::endl;
     if (event->button() == Qt::LeftButton && image_loaded && myPenColor!=Qt::red) {
         lastPoint = event->pos();
         scribbling = true;
     }
-    //std::cout<<"je suis a 4"<<std::endl;
     if(myPenColor==Qt::red && countPoints<2)
     {
-        //std::cout<<"je suis a 5"<<std::endl;
         drawPointTo(event->pos());
         if(countPoints==0)
         {
@@ -200,7 +224,6 @@ void scribble::mousePressEvent(QMouseEvent *event)
             pointB.setX(event->pos().x());
             pointB.setY(event->pos().y());
         }
-        //std::cout<<"je suis a 6"<<std::endl;
     }
 }
 
@@ -231,9 +254,11 @@ void scribble::mouseReleaseEvent(QMouseEvent *event)
         pointABis.setY(pointA.y()-(pointB.y()-pointA.y())/(pointB.x()-pointA.x())*pointA.x());
         pointBBis.setX(image.width());
         pointBBis.setY(pointA.y()+(image.width()-pointA.x())*(pointB.y()-pointA.y())/(pointB.x()-pointA.x()));
-        std::cout<<"le point A est:("<<pointABis.x()<<","<<pointABis.y()<<") "<<"le point B est:("<<pointBBis.x()<<","<<pointBBis.y()<<") "<<std::endl;
-        drawSimpleLineTo(pointABis,pointBBis);
-        array_image[slider->value()]=image;
+        for(int i=0;i<slider->maximum()+1;i++){
+            image=array_image[i];
+            drawSimpleLineTo(pointABis,pointBBis);
+            array_image[i]=image;
+        }
     }
 }
 
@@ -241,11 +266,10 @@ void scribble::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
     QRect dirtyRect = event->rect();
-    //std::cout<<"where"<<dirtyRect.size().width()<<","<<dirtyRect.height()<<std::endl;
-    painter.drawImage(dirtyRect, image/*array_image[array_counter]*/, dirtyRect);
+    painter.drawImage(dirtyRect, image, dirtyRect);
 }
 
-void scribble::resizeEvent(QResizeEvent *event)
+/*void scribble::resizeEvent(QResizeEvent *event)
 {
     if (width() > image.width() || height() > image.height()) {
         int newWidth = qMax(width() + 128, image.width());
@@ -254,11 +278,11 @@ void scribble::resizeEvent(QResizeEvent *event)
         update();
     }
     QWidget::resizeEvent(event);
-}
+}*/
 
 void scribble::drawSimpleLineTo(const QPoint &a, const QPoint &b)
 {
-    QPainter painter(&image/*&array_image[array_counter]*/);
+    QPainter painter(&image);
     painter.setPen(QPen(myPenColor, myPenWidth, Qt::SolidLine, Qt::RoundCap,
                         Qt::RoundJoin));
     painter.drawLine(a, b);
@@ -287,7 +311,7 @@ void scribble::drawPointTo(const QPoint &Point)
     update();
 }
 
-void scribble::resizeImage(QImage *image, const QSize &newSize)
+/*void scribble::resizeImage(QImage *image, const QSize &newSize)
 {
     if (image->size() == newSize)
         return;
@@ -297,14 +321,14 @@ void scribble::resizeImage(QImage *image, const QSize &newSize)
     QPainter painter(&newImage);
     painter.drawImage(QPoint(0, 0), *image);
     *image = newImage;
-}
+}*/
 
 void scribble::display_image(int number_image)
 {
     //QImage loadedImage;
     //loadedImage.load(array[number_image]);
-    QSize newSize = /*loadedImage*/array_image[number_image].size().expandedTo(size());
-    resizeImage(&array_image[number_image]/*&loadedImage*/, newSize);
+    //QSize newSize = /*loadedImage*/array_image[number_image].size().expandedTo(size());
+    //resizeImage(&array_image[number_image]/*&loadedImage*/, newSize);
     image = /*loadedImage*/array_image[number_image];
     update();
 }
@@ -322,14 +346,19 @@ double scribble::computeAlgorithm1(int margin)
     volume_final=volume_tumor/(volume_tumor+volume_liver);
     return volume_final;
 }
-double scribble::computeAlgorithm2(int margin, int part)
+double scribble::computeAlgorithm2(int margin, double percentage, int part)
 {
     double volume_final=0;
     double volume_liver=0;
     double volume_tumor=0;
     for(int i=0;i<array_counter;i++)
     {
-        volume_liver=volume_liver+getVolumeAfterSeparation(array_image[i],part);
+        double increase_volume=getVolumeAfterSeparation(array_image[i],part,percentage);
+        if(increase_volume<0)
+        {
+            return -1;
+        }
+        volume_liver=volume_liver+increase_volume;
         volume_tumor=volume_tumor+getVolumeTumor(array_image[i],margin);
     }
     volume_final=volume_tumor/(volume_tumor+volume_liver);

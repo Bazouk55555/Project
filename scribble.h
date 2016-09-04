@@ -42,7 +42,7 @@ public:
     double computeAlgorithm1(int margin);
 
     // Compute the algorithm for the PVE
-    double computeAlgorithm2(int margin, int part);
+    double computeAlgorithm2(int margin, double percentage, int part);
 
     // Indicate if modifications have been made
     bool isModified() const { return modified; }
@@ -82,7 +82,7 @@ protected:
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
 
     // Method to resize
-    void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
+    //void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
 
 private:
 

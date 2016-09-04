@@ -56,7 +56,7 @@ bool isPng(std::string file){
     return true;
 }
 
-//All this code was used to transform a dicom image to a jpeg using Imebra library. It is not useful anymore but it can be in the future
+//All this code is used to transform a dicom image to a jpeg using Imebra library.
 
 
 using namespace puntoexe;
@@ -79,7 +79,7 @@ void outputDatasetTags(ptr<dataSet> dataset, std::wstring prefix)
             ptr<data> tag = tagIterator->getData();
             std::string dataType(tag->getDataType());
             std::wstring tagName = imebra::dicomDictionary::getDicomDictionary()->getTagName(groupIterator->getId(), tagIterator->getId());
-            std::wcout << prefix << L"Tag " << groupIterator->getId() << L"," << tagIterator->getId() << L" (" << tagName << L")" << std::endl;
+            //std::wcout << prefix << L"Tag " << groupIterator->getId() << L"," << tagIterator->getId() << L" (" << tagName << L")" << std::endl;
             if(tag->getDataSet(0) != 0)
             {
                 for(imbxUint32 sequenceNumber(0); ; ++sequenceNumber)
@@ -89,7 +89,7 @@ void outputDatasetTags(ptr<dataSet> dataset, std::wstring prefix)
                     {
                         break;
                     }
-                    std::wcout << prefix << L"  SEQUENCE " << sequenceNumber << std::endl;
+                    //std::wcout << prefix << L"  SEQUENCE " << sequenceNumber << std::endl;
                     outputDatasetTags(sequenceDataSet, prefix + L"    ");
                 }
                 continue;
@@ -101,13 +101,13 @@ void outputDatasetTags(ptr<dataSet> dataset, std::wstring prefix)
                     ptr<handlers::dataHandler> handler = tag->getDataHandler(numBuffer, false, "");
                     for(imbxUint32 scanHandler(0); scanHandler != handler->getSize(); ++scanHandler)
                     {
-                        std::wcout << prefix << L"  buffer " << numBuffer << L", position "<< scanHandler << ":" << tag->getDataHandler(numBuffer, false, "")->getUnicodeString(scanHandler) << std::endl;
+                        //std::wcout << prefix << L"  buffer " << numBuffer << L", position "<< scanHandler << ":" << tag->getDataHandler(numBuffer, false, "")->getUnicodeString(scanHandler) << std::endl;
                     }
                 }
                 else
                 {
                     ptr<handlers::dataHandlerRaw> handlerRaw = tag->getDataHandlerRaw(numBuffer, false, "");
-                    std::wcout << prefix << L"  Not shown: size " << handlerRaw->getSize() << " bytes" << std::endl;
+                    //std::wcout << prefix << L"  Not shown: size " << handlerRaw->getSize() << " bytes" << std::endl;
                 }
             }
         }
@@ -116,7 +116,7 @@ void outputDatasetTags(ptr<dataSet> dataset, std::wstring prefix)
 int transformation(std::string source, std::string destination)
 {
     std::wstring version(L"1.0.0.1");
-    std::wcout << L"dicom2jpeg version " << version << std::endl;
+    //std::wcout << L"dicom2jpeg version " << version << std::endl;
     try
     {
         size_t framesCount(0);
@@ -234,14 +234,14 @@ int transformation(std::string source, std::string destination)
     }
     catch(...)
     {
-        std::wcout << exceptionsManager::getMessage();
+        //std::wcout << exceptionsManager::getMessage();
         return 1;
     }
 }
 
 std::string changeDicomToJpeg(std::string dicom)
 {
-    std::cout<<"in fonction "<<dicom<<std::endl;
+    //std::cout<<"in fonction "<<dicom<<std::endl;
     std::string jpeg_bis="";
     int i=dicom.length()-4;
     int j=0;
@@ -259,7 +259,7 @@ std::string changeDicomToJpeg(std::string dicom)
     jpeg+="j";
     jpeg+="p";
     jpeg+="g";
-    std::cout<<"in function: "<<jpeg<<std::endl;
+    //std::cout<<"in function: "<<jpeg<<std::endl;
     return jpeg;
 }
 

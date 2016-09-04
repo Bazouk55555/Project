@@ -70,7 +70,7 @@ int getVolumeTumor(QImage image_computed, int margin)
     return volume;
 }
 
-int getVolumeAfterSeparation(QImage image_computed, int part)
+int getVolumeAfterSeparation(QImage image_computed, int part,double percentage)
 {
     bool a=false;
 
@@ -132,7 +132,7 @@ int getVolumeAfterSeparation(QImage image_computed, int part)
                     if(colorPixel.green()<80&&colorPixel.red()<80&&colorPixel.blue()>110)
                     {
                         QMessageBox::information(0, "Result", "You have probably chosen the wrong part");
-                        return 0;
+                        return -1;
                     }
                 }
             }
@@ -146,23 +146,22 @@ int getVolumeAfterSeparation(QImage image_computed, int part)
                     //std::cout<<"i : "<<i<<" j : "<<j<<std::endl;
                     if(colorPixel.red()>110&&colorPixel.blue()<80&&colorPixel.green()<80)
                     {
-                        std::cout<<"atteint le rouge"<<endl;
                         break;
                     }
                     if(colorPixel.green()>110&&colorPixel.red()<80&&colorPixel.blue()<80)
                     {
-                        std::cout<<"augmente le volume"<<endl;
                         volume++;
                     }
 
                     if(colorPixel.green()<80&&colorPixel.red()<80&&colorPixel.blue()>110)
                     {
-                        std::cout<<"hahahahahahahaha"<<std::endl;
+                        std::cout<<"Before the message"<<std::endl;
                         QMessageBox::information(0, "Result", "You have probably chosen the wrong part");
-                        return 0;
+                        std::cout<<"Before the return"<<std::endl;
+                        return -1;
+                        std::cout<<"After the return"<<std::endl;
                     }
                 }
-                //std::cout<<"pipi"<<std::endl;
             }
             delete s[i];
             delete color[i];
@@ -170,13 +169,13 @@ int getVolumeAfterSeparation(QImage image_computed, int part)
         delete s;
         delete color;
     }
-    std::cout<<"le volume prus est de "<<volume<<std::endl;
-    volume=getVolumeLiver(image_computed)+volume;
+    volume=getVolumeLiver(image_computed)+percentage*volume;
     return volume;
 }
 
 int margiumLiver(QImage image, int margium){
     int volume=0;
+    margium=3.779527559055*margium;
     int **tab=new int *[image.size().width()];
     // Put 0 in all the array;
     for(int i=0;i<image.size().width();i++)

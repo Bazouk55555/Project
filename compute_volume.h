@@ -10,7 +10,7 @@ int getVolumeLiver(QImage image_computed);
 int getVolumeTumor(QImage image_computed, int margin);
 
 // Compute the volume of the liver in green after the PVE surgery
-int getVolumeAfterSeparation(QImage image_computed, int part);
+int getVolumeAfterSeparation(QImage image_computed, int part, double percentage);
 
 // Compute the margin
 int margiumLiver(QImage image, int margium);

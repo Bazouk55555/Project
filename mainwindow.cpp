@@ -14,8 +14,7 @@ mainwindow::mainwindow()
     createMenus();
 
     setWindowTitle(tr("Liver Surgery Helping"));
-    resize(1000, 1000);
-    //std::cout<<"the width of the scribble is: "<<scribbleArea->size().width()<<" and the height is: "<<scribbleArea->size().height()<<std::endl;
+    resize(500, 500);
 }
 
 void mainwindow::closeEvent(QCloseEvent *event)
@@ -67,7 +66,6 @@ void mainwindow::openFile()
 {
     if (maybeSave()) {
         QString fileName = QFileDialog::getOpenFileName(this);
-        //std::cout<<"et ici scribble vaut ("<<scribbleArea->size().width()<<","<<scribbleArea->size().height()<<")"<<std::endl;
         if (!fileName.isEmpty())
         {
             scribbleArea->openFile(fileName);
@@ -89,7 +87,6 @@ void mainwindow::save()
 void mainwindow::displayIn3D()
 {
     std::string command="ipython C:/Users/User/Desktop/testpy.py ";
-    scribbleArea->clearImage();
     command.append(directory_dicom);
     system(command.c_str());
 }
@@ -97,7 +94,6 @@ void mainwindow::displayIn3D()
 void mainwindow::displayJPGIn3D()
 {
     std::string command="ipython C:/Users/User/Desktop/testpy2.py ";
-    scribbleArea->clearImage();
     command.append(directory_segmentation.toStdString());
     system(command.c_str());
 }
@@ -111,7 +107,6 @@ void mainwindow::segment()
     command.append(directory_dicom);
     command.append(" ");
     command.append(directory_segmentation.toStdString());
-    //std::cout<<command<<" lol!!!!!"<<std::endl;
     system(command.c_str());
     scribbleArea->openFolder(directory_segmentation);
     display_segmentation_in_3d->setEnabled(true);
@@ -125,12 +120,11 @@ void mainwindow::enterDatas()
     if (ok)
     {
         ok=false;
-        double margin_entered= QInputDialog::getDouble(this,"Margin", "Enter the margin", 0,0,2,2, &ok);
+        double margin_entered= QInputDialog::getDouble(this,"Margin", "Enter the margin", 0,0,10,2, &ok);
         if(ok)
         {
             volume=volume_entered;
             margin=margin_entered;
-            //std::cout<<"The volume of the margin is : "<<margiumLiver(scribbleArea->getImage(),margin)<<std::endl;
             compute_algorithm1->setEnabled(true);
             return;
         }
@@ -152,10 +146,14 @@ void mainwindow::computeAlgorithm1()
     {
         std::string message="The volume remaining is ";
         message.append(std::to_string(pourcentage_liver));
-        message.append(". A direct removal of the tuumor from the liver can be maid");
+        message.append(". A direct removal of the tumor from the liver can be maid");
         QMessageBox::information(this, "Result", message.c_str());
         return;
     }
+    std::string message="The volume remaining is ";
+    message.append(std::to_string(pourcentage_liver));
+    message.append(". A direct removal of the tumor from the liver can not be maid");
+    QMessageBox::information(this, "Result", message.c_str());
     QMessageBox::information(this, "Result", "Click on the option : Choose vein intersection to continue");
     technique2->setEnabled(true);
 }
@@ -173,12 +171,27 @@ void mainwindow::computeAlgorithm2()
     }
     if(ok)
     {
-        double pourcentage_liver=1-scribbleArea->computeAlgorithm2(margin,part_of_liver);
+        double percentage= QInputDialog::getDouble(this,"Percentage of increase of the healthy volume of the liver", "Enter the Percentage of increase of the healthy volume of the liver",  0,0,1,2, &ok);
+        double pourcentage_liver=1-scribbleArea->computeAlgorithm2(margin,percentage,part_of_liver);
+        while(pourcentage_liver>1)
+        {
+            part_of_liver= QInputDialog::getInt(this,"Part of the liver", "Choose the part of the liver which must increase (1 for the low part, 0 for the high part)", 0,0,1,0, &ok);
+            percentage= QInputDialog::getDouble(this,"Percentage of increase of the healthy volume of the liver", "Enter the Percentage of increase of the healthy volume of the liver",  0,0,1,2, &ok);
+            pourcentage_liver=1-scribbleArea->computeAlgorithm2(margin,percentage,part_of_liver);
+        }
         if(pourcentage_liver>volume)
         {
             std::string message="The volume remaining is ";
             message.append(std::to_string(pourcentage_liver));
             message.append(". A PVE can be maid");
+            QMessageBox::information(this, "Result", message.c_str());
+            return;
+        }
+        else
+        {
+            std::string message="The volume remaining is ";
+            message.append(std::to_string(pourcentage_liver));
+            message.append(". A PVE can not be maid");
             QMessageBox::information(this, "Result", message.c_str());
             return;
         }
@@ -197,8 +210,6 @@ void mainwindow::selectLiver()
     scribbleArea->setPenColor(Qt::green);
 }
 void mainwindow::separationLiver(){
-    //std::cout<<"je suis a 1"<<std::endl;
-    //std::cout<<"je suis a 2"<<std::endl;
     penWidthAct->setEnabled(false);
     scribbleArea->setPenWidth(1);
     scribbleArea->setImageLoaded(true);
@@ -281,7 +292,7 @@ void mainwindow::createActions()
     compute_algorithm2->setEnabled(false);
     connect(compute_algorithm2, SIGNAL(triggered()), this, SLOT(computeAlgorithm2()));
 
-    technique2=new QAction(tr("&Chose intersection vein points"), this);
+    technique2=new QAction(tr("&Choose vein points"), this);
     technique2->setEnabled(false);
     connect(technique2, SIGNAL(triggered()), this, SLOT(separationLiver()));
 
