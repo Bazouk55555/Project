@@ -17,6 +17,29 @@ mainwindow::mainwindow()
     resize(500, 500);
 }
 
+mainwindow::~mainwindow(){
+    delete scribbleArea;
+
+    delete saveAsMenu;
+    delete fileMenu;
+    delete optionMenu;
+    delete openDicom;
+    delete openAct;
+    delete openAct2;
+    delete exitAct;
+    delete display_dicom_in_3d;
+    delete display_segmentation_in_3d;
+    delete segmentation;
+    delete input_datas;
+    delete compute_algorithm1;
+    delete compute_algorithm2;
+    delete technique2;
+    delete select_tumor;
+    delete select_liver;
+    delete penWidthAct;
+    delete clearScreenAct;
+}
+
 void mainwindow::closeEvent(QCloseEvent *event)
 {
     if (maybeSave()) {
@@ -146,15 +169,15 @@ void mainwindow::computeAlgorithm1()
     {
         std::string message="The volume remaining is ";
         message.append(std::to_string(pourcentage_liver));
-        message.append(". A direct removal of the tumor from the liver can be maid");
+        message.append(". A direct removal of the tumor from the liver can be performed");
         QMessageBox::information(this, "Result", message.c_str());
         return;
     }
     std::string message="The volume remaining is ";
     message.append(std::to_string(pourcentage_liver));
-    message.append(". A direct removal of the tumor from the liver can not be maid");
+    message.append(". A direct removal of the tumor from the liver cannot be performed");
     QMessageBox::information(this, "Result", message.c_str());
-    QMessageBox::information(this, "Result", "Click on the option : Choose vein intersection to continue");
+    QMessageBox::information(this, "Result", "Click on the option : Choose vein points to continue");
     technique2->setEnabled(true);
 }
 
@@ -183,7 +206,7 @@ void mainwindow::computeAlgorithm2()
         {
             std::string message="The volume remaining is ";
             message.append(std::to_string(pourcentage_liver));
-            message.append(". A PVE can be maid");
+            message.append(". A PVE can be performed");
             QMessageBox::information(this, "Result", message.c_str());
             return;
         }
@@ -191,7 +214,7 @@ void mainwindow::computeAlgorithm2()
         {
             std::string message="The volume remaining is ";
             message.append(std::to_string(pourcentage_liver));
-            message.append(". A PVE can not be maid");
+            message.append(". A PVE cannot be performed");
             QMessageBox::information(this, "Result", message.c_str());
             return;
         }

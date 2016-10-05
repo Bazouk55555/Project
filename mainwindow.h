@@ -12,6 +12,7 @@ class mainwindow : public QMainWindow
 
 public:
     mainwindow();
+    ~mainwindow();
 
 protected:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;

@@ -31,7 +31,6 @@ int getVolumeLiver(QImage image_computed){
     }
     delete s;
     delete color;
-    std::cout<<"the volume of the liver is : "<<volume<<std::endl;
     return volume;
 }
 
@@ -66,7 +65,6 @@ int getVolumeTumor(QImage image_computed, int margin)
     delete s;
     delete color;
     volume=volume+margin;
-    std::cout<<"the volume of the tumor is : "<<volume<<std::endl;
     return volume;
 }
 
@@ -93,7 +91,6 @@ int getVolumeAfterSeparation(QImage image_computed, int part,double percentage)
             break;
         }
     }
-    std::cout<<"a vaut "<<a<<std::endl;
     int volume=0;
 
     // If the separation has been maid
@@ -119,14 +116,12 @@ int getVolumeAfterSeparation(QImage image_computed, int part,double percentage)
                     // If there is a red pixel the red line of separation has been reached, we can go to the next column
                     if(colorPixel.red()>110&&colorPixel.blue()<80&&colorPixel.green()<80)
                     {
-                        std::cout<<"break"<<std::endl;
                         break;
                     }
                     // If the separation is still not reached, one more pixel is added to the volume
                     if(colorPixel.green()>110&&colorPixel.red()<80&&colorPixel.blue()<80)
                     {
                         volume++;
-                        std::cout<<"volume++"<<std::endl;
                     }
                     // If a blue pixel is reached, the wrong part of the liver has been chosen
                     if(colorPixel.green()<80&&colorPixel.red()<80&&colorPixel.blue()>110)
@@ -143,7 +138,6 @@ int getVolumeAfterSeparation(QImage image_computed, int part,double percentage)
                     s[i][image_computed.size().height()-j]=image_computed.pixel(i,j);
                     color[i][image_computed.size().height()-j].setRgb((s[i][image_computed.size().height()-j]));
                     QColor colorPixel=color[i][image_computed.size().height()-j];
-                    //std::cout<<"i : "<<i<<" j : "<<j<<std::endl;
                     if(colorPixel.red()>110&&colorPixel.blue()<80&&colorPixel.green()<80)
                     {
                         break;
@@ -155,11 +149,8 @@ int getVolumeAfterSeparation(QImage image_computed, int part,double percentage)
 
                     if(colorPixel.green()<80&&colorPixel.red()<80&&colorPixel.blue()>110)
                     {
-                        std::cout<<"Before the message"<<std::endl;
                         QMessageBox::information(0, "Result", "You have probably chosen the wrong part");
-                        std::cout<<"Before the return"<<std::endl;
                         return -1;
-                        std::cout<<"After the return"<<std::endl;
                     }
                 }
             }

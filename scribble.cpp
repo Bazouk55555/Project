@@ -22,6 +22,10 @@ scribble::scribble(QWidget *parent)
     QObject::connect(slider, SIGNAL(valueChanged(int)), this, SLOT(display_image(int))) ;
 }
 
+scribble::~scribble(){
+    delete slider;
+}
+
 QImage scribble::getImage()
 {
     return image;
@@ -51,7 +55,7 @@ bool scribble::openFile(const QString &fileName)
     return true;
 }
 
-/*bool scribble::openFolderDicom(const QString &directoryName)
+bool scribble::openFolderDicom(const QString &directoryName)
 {
     QImage loadedImage;
     QDir myDir(directoryName);
@@ -61,11 +65,9 @@ bool scribble::openFile(const QString &fileName)
     {
         if(isDicom(list_all_files.at(i).toStdString()))
         {
-            std::cout<<"here the dicom image called: "<<list_all_files.at(i).toStdString()<<std::endl;
             std::string fileName=directoryName.toStdString()+"/"+list_all_files.at(i).toStdString();
             // transform the name of the file from .dcm to .jpg and the file from dicom to jpeg and load the new jpeg image
             std::string fileName1_str=changeDicomToJpeg(fileName);
-            std::cout<<"le filename dicom est: "<<fileName<<" alors que le jpg filename est "<<fileName1_str<<std::endl;
             transformation(fileName,fileName1_str);
             QString fileName1(fileName1_str.c_str());
             if (!loadedImage.load(fileName1)){
@@ -78,46 +80,12 @@ bool scribble::openFile(const QString &fileName)
 
             // and an image to the slider
             array[array_counter]=list_all_files.at(i);
-            std::cout<<"array_counter est de "<<array_counter<<" et ce file a pour nom: "<<array[array_counter].toStdString()<<std::endl;
             array_image[array_counter]=image;
             array_counter++;
             slider->setMaximum(array_counter-1);
 
             modified = false;
             update();
-        }
-    }
-    slider->setSliderPosition(slider->maximum());
-    return true;
-}*/
-
-bool scribble::openFolderDicom(const QString &directoryName)
-{
-    std::string command="ipython C:/Users/User/Desktop/displaydicom.py ";
-    command.append("C:/Users/User/Desktop/All_liver/TCGA-LIHC/TCGA-BC-A3KG/1.3.6.1.4.1.14519.5.2.1.8421.4008.303533339368406310446855637599/1.3.6.1.4.1.14519.5.2.1.8421.4008.807354510232772395197490232364");
-    system(command.c_str());
-    QString directoryName1=QString::fromStdString("C:/Users/User/Desktop/DicomImages");
-    QImage loadedImage;
-    QDir myDir(directoryName1);
-    QStringList list_all_files=myDir.entryList();
-    for(int i=0;i<list_all_files.length();i++)
-    {
-        if(isJpg(list_all_files.at(i).toStdString()) || isPng(list_all_files.at(i).toStdString())){
-            std::string fileName=directoryName1.toStdString()+"/"+list_all_files.at(i).toStdString();
-            QString fileName1(fileName.c_str());
-            if (!loadedImage.load(fileName1)){
-                return false;
-            }
-            image = loadedImage;
-
-            // and an image to the slider
-            array[array_counter]=list_all_files.at(i);
-            array_image[array_counter]=image;
-            array_counter++;
-            slider->setMaximum(array_counter-1);
-
-        modified = false;
-        update();
         }
     }
     slider->setSliderPosition(slider->maximum());

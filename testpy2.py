@@ -20,9 +20,7 @@ def reconstitute_volume(folder):
 		for i in range(0,len(ndap)):
 			for j in range(0,len(ndap[0])):
 				if ndap[i][j][0]<100 and ndap[i][j][1]>170 and ndap[i][j][2]<100:
-					print "g"
-				#elif ndap[i][j][0]<100 and ndap[i][j][1]<100 and ndap[i][j][2]>170:
-				#	print"v"
+					print "green"
 				else:
 					ndap[i][j][0]=0
 					ndap[i][j][1]=0
@@ -36,9 +34,7 @@ def reconstitute_volume(folder):
 		for i in range(0,len(ndap2)):
 			for j in range(0,len(ndap2[0])):
 				if ndap2[i][j][0]<100 and ndap2[i][j][2]>150:
-					print "g"
-				#elif ndap[i][j][0]<100 and ndap[i][j][1]<100 and ndap[i][j][2]>170:
-				#	print"v"
+					print "blue"
 				else:
 					ndap2[i][j][0]=0
 					ndap2[i][j][1]=0

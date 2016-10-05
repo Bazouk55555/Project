@@ -37,27 +37,22 @@ def segmentImage(path_dicom, folder_save):
 	#		print file
 	i=0
 	for file in os.listdir(pathDicom):
-		print i
 		if i<10:
 			name=folder_save+"/test00"+str(i)
 		if i>10 and i<100:
 			name=folder_save+"/test0"+str(i)
 		if i>100:
 		  	name=folder_save+"/test"+str(i)
-		imgOriginale = imgOriginal[:140,:200,i]
+		imgOriginale = imgOriginal[:145,:200,i]
 
 		imgSmooth = SimpleITK.CurvatureFlow(image1=imgOriginale,
 		                    timeStep=0.125,
 		                    numberOfIterations=5)
 
 	#SEGMENTATION STARTS HERE
-		if file.endswith(".dcm")and i<19:
 
-			sitk_show(imgSmooth,name)
+		if file.endswith(".dcm")and i>18 and i<27:
 
-		elif file.endswith(".dcm")and i>18 and i<27:
-
-			print "lol!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 			lstSeeds = [(70,149)]
 
 			imgWhiteMatter = SimpleITK.ConnectedThreshold(image1=imgSmooth, 
@@ -113,7 +108,6 @@ def segmentImage(path_dicom, folder_save):
 
 				imgLabels = imgWhiteMatterNoHoles | imgGrayMatterNoHoles
 				img= SimpleITK.LabelOverlay(imgSmoothInt, imgLabels)
-				#i=i+1
 				sitk_show(SimpleITK.LabelOverlay(imgSmoothInt, imgLabels),name)
 
 			elif i>52 and i<61:
@@ -133,18 +127,12 @@ def segmentImage(path_dicom, folder_save):
 
 				imgLabels = imgWhiteMatterNoHoles | imgGrayMatterNoHoles
 				img= SimpleITK.LabelOverlay(imgSmoothInt, imgLabels)
-				#i=i+1
 				sitk_show(SimpleITK.LabelOverlay(imgSmoothInt, imgLabels),name)		
 
 			else:
-				#i=i+1
 				sitk_show(SimpleITK.LabelOverlay(imgSmoothInt, imgWhiteMatterNoHoles),name)
-			#i=i+1
-		else:
-			sitk_show(imgSmooth,name)
 		i=i+1		
-			#sitk_show(SimpleITK.LabelOverlay(imgSmoothInt, imgGrayMatterNoHoles),name)
 
-	print "hahaha"
+	
 
 segmentImage(sys.argv[1],sys.argv[2])

@@ -14,6 +14,7 @@ class scribble : public QWidget
 
 public:
     scribble(QWidget *parent = 0);
+    ~scribble();
 
     //Return the image
     QImage getImage();
